@@ -226,11 +226,6 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .hp .decl b{font-size:calc(17.5px*var(--ui,1));letter-spacing:.15em}.hp .decl li{font-size:calc(14.5px*var(--ui,1))}
 .hp a{color:var(--accent)}
 .hp .sign{text-align:center;font-size:calc(14.5px*var(--ui,1));color:var(--soft);letter-spacing:.15em;margin:14px 0 4px}
-.rcbar{display:flex;gap:1px;height:28px;margin:14px 0 4px;touch-action:none;user-select:none;-webkit-user-select:none}
-.rcbar i{flex:1 1 0;border-radius:3px;background:rgba(255,252,247,.85);border:1px solid var(--line);transition:transform .15s}
-.rcbar i.ln{background:linear-gradient(#f9dfa8,#e9bb62);border-color:#d9a84a}
-.rcbar i.kn{background:linear-gradient(#ea9a8e,#c9705a);border-color:#c9705a}
-.rcbar i.pk{transform:scaleY(1.35);box-shadow:0 0 0 2px rgba(201,112,90,.35)}
 .rcends{display:flex;justify-content:space-between;font-size:calc(12.5px*var(--ui,1));color:var(--soft);letter-spacing:.08em}
 #rcStart,#rcMore{white-space:nowrap}
 .wl{position:absolute;inset:0;z-index:70;background:rgba(80,55,40,.5);display:none;align-items:center;justify-content:center;padding:16px}
@@ -251,6 +246,13 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .setbox .seg{margin-top:8px}.setbox .seg button{padding:14px 4px}
 .setbox .note{margin:8px 0 0}
 .tabs button svg circle{fill:var(--paper)}
+
+.rcbar{position:relative;height:38px;margin:12px 0 2px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.rcbar .tr{position:absolute;left:0;right:0;top:12px;height:14px;display:flex;border-radius:8px;overflow:hidden;background:#f0e2d3;box-shadow:inset 0 1px 3px rgba(120,80,50,.2)}
+.rcbar i{flex:1 1 0;background:transparent;box-shadow:inset -1px 0 rgba(255,250,244,.85)}
+.rcbar i.ln{background:linear-gradient(#f9dfa8,#e5b459)}
+.rcbar i.kn{background:linear-gradient(#ea9a8e,#c9705a)}
+.rcbar .hd{position:absolute;top:4px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:#fffaf4;border:3px solid var(--accent);box-shadow:0 3px 8px rgba(120,60,40,.3);pointer-events:none;transition:left .12s;left:0}
 </style>
 </head>
 <body>
@@ -755,7 +757,7 @@ function renderRec(){
   const st=$('#rcStart'),more=$('#rcMore');
   if(d+(canNew?1:0)>0){st.disabled=false;st.textContent='開始今天的背誦';$('#rcStartNote').textContent=[canNew?`新 1 段（約 ${nn.n} 字）`:'',d?`複習 ${d} 段`:''].filter(Boolean).join('、')}else{st.disabled=true;st.textContent=nn?'今天的份量完成了':'整部經都背過了';$('#rcStartNote').textContent=''}
   more.style.display=(!canNew&&nn)?'':'none';
-  $('#rcMap').innerHTML=CARDS.map(c=>{const o=cards[c.id];return `<i style="flex:${c.n} 1 0" class="${o?(o.s>=5?'kn':'ln'):''}"></i>`}).join('');
+  $('#rcMap').innerHTML='<div class="tr">'+CARDS.map(c=>{const o=cards[c.id];return `<i style="flex:${c.n} 1 0" class="${o?(o.s>=5?'kn':'ln'):''}"></i>`}).join('')+'</div><b class="hd"></b>';
   const nx=Object.values(cards).map(c=>c.due).filter(t=>t>Date.now()).sort((a,b)=>a-b)[0];
   $('#rcNote').textContent=nx&&!d?'下一段要複習的時間：'+new Date(nx).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+'。':'整條是整部經：淡色＝還沒背，金色＝背誦中，橘色＝已熟（連續記得 5 次）。';
   $('#fullImg').src=imgSrc(9);const fu=store.get('fullU',0);$('#fullSub').textContent=fu?`上次停在第 ${fu+1} 段，點一下接著誦`:`15 段，一句一句誦完${recAll?'（已誦完 '+recAll+' 次）':''}`;
@@ -807,7 +809,8 @@ function rcPickUI(){
   if(keep&&CARDS.some(c=>c.id===keep))sel.value=keep;else{const nn=nextNew();sel.value=(nn||CARDS[0]).id}
   const M=RCM[rcMode];$('#rcSizeNote').textContent=`${M.label}：每段${M.per}，共 ${CARDS.length} 段。三種大小各自記錄進度，隨時可以換。`;
   const mp=[...document.querySelectorAll('#rcMap i')],bar=$('#rcMap');
-  const mark=()=>{const c=CARDS.find(x=>x.id===sel.value);mp.forEach((e,i)=>e.classList.toggle('pk',CARDS[i]&&CARDS[i].id===sel.value));
+  const mark=()=>{const c=CARDS.find(x=>x.id===sel.value);
+    const hd=bar.querySelector('.hd');if(hd&&c){let a=0;for(const x of CARDS){if(x===c)break;a+=x.n}hd.style.left=((a+c.n/2)/TOTAL_CH*100)+'%'}
     if(c){const o=cards[c.id];$('#rcSelNote').textContent=`第 ${c.k} 段・${head(c.text)}・約 ${c.n} 字・${o?(o.s>=5?'已熟':'背誦中'):'還沒背'}`}};
   const idxAt=x=>{const r=bar.getBoundingClientRect(),f=Math.max(0,Math.min(1,(x-r.left)/r.width))*TOTAL_CH;let a=0;for(let i=0;i<CARDS.length;i++){a+=CARDS[i].n;if(f<=a)return i}return CARDS.length-1};
   const pick=x=>{sel.value=CARDS[idxAt(x)].id;mark()};
