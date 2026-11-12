@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>持名號・念佛計數（原型 v3）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fdf1e5;--ink:#7a4e3a;--soft:#a98b78;--accent:#c9705a;--line:rgba(180,140,110,.28);--gold:#d9a84a;--glass:rgba(255,252,247,.72)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:"Noto Serif TC","Songti TC","PingFang TC","Microsoft JhengHei",serif}
+button,select,input,textarea{font:inherit;color:inherit}
+#frame{position:relative;width:100%;max-width:480px;height:100dvh;margin:0 auto;background:var(--paper) url(assets/bg-top.jpg) top center/100% auto no-repeat;overflow:hidden}
+.screen,#app{display:none;position:absolute;inset:0;flex-direction:column;align-items:center}
+.screen.on,#app.on{display:flex}
+.screen{padding:28px 18px 24px;overflow:auto}
+h1{font-size:26px;font-weight:400;margin:10px 0 2px;letter-spacing:.3em}
+h2{font-size:17px;margin:18px 0 6px;font-weight:600;letter-spacing:.1em}
+.sub{color:var(--soft);font-size:14px;margin:0 0 16px;letter-spacing:.1em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+.card{background:var(--glass);border:1.5px solid var(--line);border-radius:18px;padding:8px 6px 10px;text-align:center;cursor:pointer;backdrop-filter:blur(4px)}
+.card.sel{border-color:var(--accent);background:rgba(255,246,238,.9);box-shadow:0 0 0 3px rgba(201,112,90,.12)}
+.card canvas{width:100%;height:auto;display:block}
+.card b{display:block;font-size:16px;font-weight:600}.card span{font-size:12px;color:var(--soft)}
+.row{display:flex;gap:10px;margin:14px 0 0;width:100%;align-items:center}
+.row label{font-size:14px;color:var(--soft);width:64px;flex:none}
+.seg{display:flex;flex:1;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:var(--glass)}
+.seg button{flex:1;border:0;background:none;padding:10px 4px;font-size:15px}
+.seg button.on{background:var(--accent);color:#fff}
+.go{margin-top:22px;width:100%;border:0;border-radius:16px;background:linear-gradient(135deg,#d58a6f,#c9705a);color:#fff;font-size:18px;padding:14px;letter-spacing:.3em;box-shadow:0 6px 18px rgba(201,112,90,.25)}
+.go:disabled{background:#e4d6cb;box-shadow:none}
+#app{max-width:480px}
+.view{display:none;flex:1;min-height:0;width:100%;flex-direction:column}
+.view.on{display:flex}
+.top{display:flex;justify-content:space-between;padding:12px 14px}
+.pill{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--soft);backdrop-filter:blur(4px)}
+.pill.on,.chip.on{border-color:var(--accent);color:var(--accent)}
+#stage{position:relative;flex:1;min-height:0;touch-action:manipulation;user-select:none}
+#cv{position:absolute;inset:0;width:100%;height:100%;-webkit-mask-image:linear-gradient(to bottom,#000 82%,transparent 100%);mask-image:linear-gradient(to bottom,#000 82%,transparent 100%)}
+#info{position:absolute;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+#info .n{font-size:76px;line-height:1;font-weight:300;font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:.02em}
+#info .name{font-size:18px;color:#b07b60;letter-spacing:.45em;margin-top:8px;padding-left:.45em}
+#info .of{font-size:12px;color:var(--soft);margin-top:6px;letter-spacing:.1em}
+#info .n.pop{animation:pop .22s ease-out}
+@keyframes pop{0%{transform:scale(1.1)}100%{transform:scale(1)}}
+.stats{display:flex;gap:20px;justify-content:center;padding:2px 0 2px;font-size:13px;color:var(--soft)}
+.stats b{color:var(--ink);font-weight:600;font-size:15px;margin-left:3px}
+.hint{font-size:12px;color:var(--soft);text-align:center;min-height:18px;letter-spacing:.1em}
+.bottom{display:flex;gap:10px;padding:6px 14px 8px}
+.bottom button{flex:1}
+.tabs{display:flex;width:100%;background:rgba(255,251,245,.85);border-top:1px solid var(--line);backdrop-filter:blur(6px)}
+.tabs button{flex:1;border:0;background:none;padding:8px 4px 10px;font-size:12px;color:var(--soft);display:flex;flex-direction:column;align-items:center;gap:2px;letter-spacing:.2em}
+.tabs button svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.tabs button.on{color:var(--accent)}
+.pad{padding:16px 18px;overflow:auto}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:10px 0}
+.day{aspect-ratio:1;border-radius:50%;border:1.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--soft);background:var(--glass)}
+.day.has{background:rgba(250,222,190,.7);border-color:var(--gold);color:var(--ink)}
+.day.now{box-shadow:0 0 0 2px rgba(201,112,90,.35)}
+.day b{font-size:15px;font-weight:600}
+.box{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:8px 0;line-height:2;letter-spacing:.08em;backdrop-filter:blur(4px)}
+.note{font-size:12px;color:var(--soft);line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.chip{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--soft)}
+.chip.on{background:rgba(255,240,232,.95)}
+textarea,input[type=text],input[type=number]{width:100%;border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--glass)}
+#cardImg{width:100%;max-width:340px;border-radius:14px;box-shadow:0 8px 24px rgba(120,80,50,.18);display:block;margin:12px auto}
+
+.read{padding:0}
+#rd-art{margin:6px 16px 0;height:27vh;min-height:150px;border-radius:20px;background:#f3e4d4 url(assets/bg-top.jpg) no-repeat;background-size:230% auto;box-shadow:0 8px 24px rgba(120,80,50,.15);position:relative;overflow:hidden}
+#rd-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#rd-art .ph{position:absolute;right:12px;bottom:8px;font-size:11px;color:rgba(122,78,58,.55);letter-spacing:.1em}
+#rd-body{flex:1;min-height:0;overflow:auto;padding:12px 18px 6px}
+#rd-body h2{margin:6px 0 2px;font-size:20px;font-weight:600;letter-spacing:.08em}
+#rd-body .ln{font-size:11px;color:var(--soft);letter-spacing:.12em;margin-bottom:8px}
+#rd-gist{font-size:14px;color:#b07b60;margin:2px 0 10px;letter-spacing:.06em}
+#rd-sutra{font-size:calc(19px*var(--fs,1));line-height:2.15;letter-spacing:.06em;white-space:pre-line;color:var(--ink)}
+.lab{display:inline-block;font-size:11px;color:#fff;background:#c9a98e;border-radius:6px;padding:1px 8px;margin:14px 0 6px;letter-spacing:.2em}
+#rd-plain{font-size:calc(15px*var(--fs,1));line-height:1.95;color:#6b5a4e}
+.rd-nav{display:flex;align-items:center;gap:8px;padding:6px 14px 8px}
+.rd-nav .pill{flex:none}
+#rd-dots{flex:1;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+#rd-dots i{width:7px;height:7px;border-radius:50%;background:rgba(180,140,110,.3)}
+#rd-dots i.on{background:var(--accent);transform:scale(1.3)}
+
+.gl details{background:var(--glass);border:1px solid var(--line);border-radius:12px;margin:6px 0}
+.gl summary{padding:10px 14px;font-size:15px;list-style:none;display:flex;justify-content:space-between;cursor:pointer;letter-spacing:.06em}
+.gl summary::-webkit-details-marker{display:none}
+.gl summary::after{content:'＋';color:var(--accent)}.gl details[open] summary::after{content:'－'}
+.gl p{margin:0;padding:0 14px 12px;font-size:calc(14px*var(--fs,1));line-height:1.9;color:#6b5a4e}
+.sy{margin:16px 0 8px;border-radius:16px;padding:14px 16px;background:linear-gradient(160deg,rgba(255,246,228,.96),rgba(252,234,222,.92));border:1px solid rgba(217,168,74,.5)}
+.sy h4{margin:0 0 4px;font-size:12px;color:#b07b60;letter-spacing:.2em;font-weight:500}
+.sy b{display:block;font-size:17px;margin-bottom:4px;letter-spacing:.06em}
+.sy ul{margin:4px 0 8px;padding-left:18px}.sy li{margin:6px 0;font-size:calc(14px*var(--fs,1));line-height:1.9;color:#6b5a4e}
+.sy .src{font-size:11px;color:var(--soft);line-height:1.6}
+.rc-home,.rc-card{padding:0}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.tile{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.tile b{display:block;font-size:22px;font-weight:600;color:var(--accent)}.tile span{font-size:11px;color:var(--soft);letter-spacing:.1em}
+.big{width:100%;border:0;border-radius:16px;background:linear-gradient(135deg,#d58a6f,#c9705a);color:#fff;font-size:17px;padding:13px;letter-spacing:.25em;margin:8px 0;box-shadow:0 6px 16px rgba(201,112,90,.25)}
+.big.alt{background:var(--glass);color:var(--accent);border:1.5px solid var(--accent);box-shadow:none}
+.big:disabled{background:#e4d6cb;color:#fff;box-shadow:none}
+.mcard{background:rgba(255,250,244,.92);border:1px solid var(--line);border-radius:20px;padding:16px 16px 14px;box-shadow:0 8px 24px rgba(120,80,50,.12);margin:10px 0}
+.mcard .ti{font-size:12px;color:var(--soft);letter-spacing:.15em;margin-bottom:8px}
+.mcard .tx{font-size:calc(21px*var(--fs,1));line-height:2.1;letter-spacing:.08em;white-space:pre-line;min-height:130px;color:var(--ink)}
+.mcard .tx i{font-style:normal;color:#d9c3b0}
+.rate{display:flex;gap:8px;margin-top:10px}.rate button{flex:1;border:1.5px solid var(--line);background:var(--glass);border-radius:14px;padding:11px 4px;font-size:15px;letter-spacing:.1em}
+.rate .g{border-color:#9bb98c;color:#5d7d4f}.rate .m{border-color:#e0b66a;color:#9a7421}.rate .f{border-color:#d49a88;color:#b0604a}
+.ulist{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
+.ulist button{border:1px solid var(--line);background:var(--glass);border-radius:12px;padding:8px 0;font-size:13px;color:var(--soft);position:relative}
+.ulist button.done{color:var(--accent);border-color:var(--gold);background:rgba(250,222,190,.55)}
+.follow{font-size:calc(22px*var(--fs,1));line-height:2.3;letter-spacing:.08em}
+.follow span{color:#c8b3a2;transition:color .3s}.follow span.on{color:var(--ink)}.follow span.cur{color:var(--accent);border-bottom:2px solid var(--gold)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:6px 0}
+.cal .wd{font-size:11px;color:var(--soft);text-align:center}
+.cal .c{aspect-ratio:1;border-radius:12px;background:var(--glass);border:1px solid rgba(210,180,150,.35);position:relative;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--soft)}
+.cal .c.now{box-shadow:0 0 0 2px rgba(201,112,90,.4)}.cal .c.sel{border-color:var(--accent)}
+.cal .c svg{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px)}
+.cal .c em{position:absolute;left:4px;top:2px;font-style:normal;font-size:9px;color:#a98b78}
+.cal .c i{position:absolute;right:4px;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.mhead{display:flex;align-items:center;justify-content:space-between;margin:10px 0 2px}.mhead b{font-size:16px;letter-spacing:.12em}
+.bars{display:flex;align-items:flex-end;gap:8px;height:84px;margin:8px 0 2px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;color:var(--soft)}
+.bars i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:linear-gradient(#f2c9a8,#e3a98a);min-height:3px}
+.ms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.ms div{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--glass);font-size:13px;color:var(--soft);line-height:1.6}
+.ms div.ok{border-color:var(--gold);background:rgba(250,230,200,.6);color:var(--ink)}
+.ms b{display:block;font-size:15px}
+.pad>*{flex:none}
+.thumbs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;margin:4px 0;-webkit-overflow-scrolling:touch}
+.th{flex:none;width:84px;border:2px solid transparent;border-radius:12px;background:none;padding:0;text-align:center}
+.th img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block}
+.th span{font-size:11px;color:var(--soft);display:block;margin-top:2px}
+.th.on{border-color:var(--accent)}.th.on span{color:var(--accent)}
+details.plan{margin:14px 0}details.plan summary{font-size:15px;font-weight:600;letter-spacing:.1em;cursor:pointer}
+
+.home{position:relative;background:#fdf1e5;overflow:auto}
+.home .hero{position:absolute;left:0;top:0;width:100%;height:46%;object-fit:cover}
+.home .fade{position:absolute;left:0;right:0;top:30%;height:18%;background:linear-gradient(rgba(253,241,229,0),#fdf1e5)}
+.home .hd{position:absolute;left:0;right:0;top:32%;text-align:center}
+.home .hd h1{margin:0;font-size:38px;font-weight:600;letter-spacing:.4em;padding-left:.4em}
+.home .hd p{margin:8px 0 0;font-size:14px;color:#7a5a48;letter-spacing:.3em;padding-left:.3em}
+.home .body{position:absolute;left:20px;right:20px;top:49%;bottom:12px;display:flex;flex-direction:column;gap:10px}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-height:0}
+.hgrid button{border:1px solid #d9b98f;border-radius:20px;background:rgba(255,250,244,.92);color:var(--ink);text-align:left;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.hgrid b{font-size:21px;font-weight:600;letter-spacing:.2em}.hgrid span{font-size:12.5px;color:#7a5a48;letter-spacing:.06em}
+.hnext{border:0;border-radius:18px;background:linear-gradient(135deg,#d58a6f,#c9705a);color:#fff;font-size:16px;letter-spacing:.2em;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;flex:none}
+.hnext small{font-size:13px;letter-spacing:.08em}
+.hst{text-align:center;font-size:13px;color:#7a5a48;letter-spacing:.1em;flex:none;background:none;border:0;padding:2px}
+#v-count{position:relative}
+#v-count::before{content:'';position:absolute;inset:0;background:var(--pond) 40% 0/cover no-repeat;opacity:.5;z-index:0}
+#v-count::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(253,241,229,.25),rgba(253,241,229,.15) 45%,rgba(253,241,229,.85));z-index:0}
+#v-count>*{position:relative;z-index:1}
+#v-count .ttl{font-size:20px;letter-spacing:.35em;color:var(--ink);font-weight:600;align-self:center}
+.bl-hd{font-size:13px;color:#7a5a48;letter-spacing:.2em}
+.bl-t{font-size:26px;letter-spacing:.12em;margin:4px 0 12px;font-weight:600}
+.bl-hero{position:relative;height:212px;border-radius:24px;overflow:hidden;box-shadow:0 10px 28px rgba(120,80,50,.18);margin-bottom:6px}
+.bl-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bl-hero .pn{position:absolute;left:16px;right:16px;bottom:14px;background:rgba(255,250,244,.84);border:1px solid rgba(205,165,100,.8);border-radius:18px;padding:12px 14px;text-align:center}
+.bl-hero .l{font-size:21px;letter-spacing:.12em;line-height:1.7;color:#6d4331}
+.bl-hero .s{font-size:12px;color:#7a5a48;letter-spacing:.12em}
+.fl{background:linear-gradient(#fdf1e5,#f9e6da);position:relative}
+.fl-art{position:relative;flex:none;height:27vh;min-height:150px;border-radius:26px;overflow:hidden;box-shadow:0 12px 30px rgba(120,80,50,.2);margin:4px 0 12px}
+.fl-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fl-art::after{content:'';position:absolute;inset:0;border-radius:26px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.fl-t{text-align:center;font-size:19px;letter-spacing:.14em;font-weight:600;margin:2px 0}
+.fl-orn{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0 8px}
+.fl-orn i{width:46px;height:1px;background:rgba(217,168,74,.9)}.fl-orn svg{width:20px;height:20px}
+.fl-body{flex:1 1 0;min-height:0;overflow:auto;padding:4px 6px 10px;text-align:center}
+.fl-body .follow{font-size:calc(23px*var(--fs,1));line-height:2.35;text-align:center}
+.fl-body .follow span.cur{border-bottom:2px solid var(--gold);text-shadow:0 0 14px rgba(240,200,120,.6)}
+.fl-prog{display:flex;justify-content:center;gap:6px;margin:6px 0 4px}
+.fl-prog i{width:8px;height:8px;border-radius:50%;background:rgba(190,150,115,.3)}.fl-prog i.on{background:var(--gold)}.fl-prog i.cu{background:var(--accent);transform:scale(1.35)}
+.fl-bar{display:flex;gap:10px;padding:6px 0 10px;flex:none}.fl-bar .big{margin:0;flex:1}.fl-bar .big.alt{flex:none;width:96px}
+.fullbtn{display:block;width:100%;text-align:left;border:1px solid #d9b98f;border-radius:20px;background:linear-gradient(120deg,rgba(255,246,228,.96),rgba(252,230,220,.92));padding:14px 16px;margin:6px 0;color:var(--ink);position:relative;overflow:hidden}
+.fullbtn b{display:block;font-size:19px;letter-spacing:.2em;font-weight:600}.fullbtn span{font-size:13px;color:#7a5a48;letter-spacing:.06em}
+.fullbtn img{position:absolute;right:0;top:0;height:100%;width:42%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 55%);mask-image:linear-gradient(90deg,transparent,#000 55%)}
+#rc-full{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+#v-rec.fullmode{overflow:hidden}
+.fl-bar .big.alt{width:112px;white-space:nowrap}
+
+.bottom{align-items:center}
+.bottom .seg{flex:none;width:132px;border-radius:999px}.bottom .seg button{padding:7px 2px;font-size:14px}
+.bottom .pill{padding-left:12px;padding-right:12px;white-space:nowrap}
+.bl-pv{position:sticky;top:-6px;z-index:6;text-align:center;padding:4px 0 10px;background:linear-gradient(#fdf1e5 88%,rgba(253,241,229,0))}
+.bl-pv canvas{height:36vh;min-height:190px;width:auto;aspect-ratio:720/1000;border-radius:16px;box-shadow:0 10px 26px rgba(120,80,50,.22)}
+#blTabs{margin:4px 0 10px;flex:none}#blTabs button{font-size:14px;padding:9px 0}
+#blPanel{min-height:96px}
+.mdl{position:absolute;inset:0;z-index:50;background:rgba(253,241,229,.98);display:none;flex-direction:column;align-items:center;justify-content:center;padding:18px;gap:10px}
+.mdl.on{display:flex}.mdl img{max-height:64%;max-width:86%;border-radius:14px;box-shadow:0 10px 26px rgba(120,80,50,.25)}
+.mdl a.big{text-decoration:none;text-align:center;box-sizing:border-box;width:100%;max-width:320px}.mdl .big{max-width:320px}
+.rcmap{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:10px 0 4px}
+.rcmap i{aspect-ratio:1;border-radius:50%;border:1.5px solid var(--line);background:var(--glass);font-style:normal;font-size:10px;color:var(--soft);display:flex;align-items:center;justify-content:center}
+.rcmap i.ln{border-color:var(--gold);background:rgba(250,222,190,.7);color:var(--ink)}.rcmap i.kn{background:var(--accent);border-color:var(--accent);color:#fff}
+.fl-prog i{cursor:pointer;width:10px;height:10px}
+.fl-body{position:relative}
+.lr{font-size:13px;color:var(--soft);text-align:center;margin:6px 0;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div id="frame">
+
+<div id="pick" class="screen">
+  <h1>持名號</h1>
+  <p class="sub">先選一串佛珠，選好才開始</p>
+  <div class="grid" id="cards"></div>
+  <div class="row"><label>持珠的手</label><div class="seg" id="handSeg"><button data-v="R" class="on">右手</button><button data-v="L">左手</button></div></div>
+  <div class="row"><label>聖號</label><div class="seg" id="nameSeg"><button data-v="阿彌陀佛" class="on">阿彌陀佛</button><button data-v="南無阿彌陀佛">南無阿彌陀佛</button></div></div>
+  <button class="go" id="go" disabled>確定</button><button class="pill" id="pickBack" style="margin-top:12px">取消</button>
+</div>
+
+<div id="app">
+  <div id="v-home" class="view home on">
+    <img class="hero" id="hmImg" alt=""><div class="fade"></div>
+    <div class="hd"><h1>阿彌陀經</h1><p>讀　誦　念　迴向</p></div>
+    <div class="body">
+      <div class="hgrid">
+        <button data-go="read"><b>讀經</b><span>15 段水彩繪本</span></button>
+        <button data-go="rec"><b>誦經</b><span>整部經典・背誦小卡</span></button>
+        <button data-go="count"><b>念佛</b><span>佛珠計數</span></button>
+        <button data-go="bless"><b>迴向</b><span>祝福卡</span></button>
+      </div>
+      <button class="hnext" id="hmNext"><span>接著讀</span><small id="hmNextT"></small></button>
+      <button class="hst" id="hmSt"></button>
+    </div>
+  </div>
+
+  <div id="v-count" class="view">
+    <div class="top"><button class="pill" id="back">換珠／設定</button><span class="ttl" id="cnTitle"></span><button class="pill" id="toDays">記錄</button></div>
+    <div id="stage"><canvas id="cv"></canvas>
+      <div id="info"><div class="n" id="n">0</div><div class="name" id="nm"></div><div class="of">本圈 / 108　<span id="third"></span></div></div></div>
+    <div class="stats"><span>今日<b id="sToday">0</b></span><span>累計<b id="sTotal">0</b></span><span>圈數<b id="sRound">0</b></span></div>
+    <div class="hint" id="hint">點畫面任何地方，撥一顆</div>
+    <div class="bottom"><button class="pill" id="undo">復原</button><div class="seg" id="handQuick"><button data-v="L">左手</button><button data-v="R">右手</button></div><button class="pill" id="wake">常亮 關</button></div>
+  </div>
+
+  <div id="v-read" class="view read">
+    <div class="top"><button class="pill" id="fsm">字 小</button><button class="pill" id="fbg">字 大</button></div>
+    <div id="rd-art"><span class="ph" id="rd-ph"></span></div>
+    <div id="rd-body"><h2 id="rd-title"></h2><div class="ln" id="rd-ln"></div><div id="rd-gist"></div>
+      <div id="rd-sutra"></div><span class="lab">白話</span><div id="rd-plain"></div>
+      <span class="lab">名詞小辭典</span><div class="gl" id="rd-gl"></div><div id="rd-sy"></div>
+      <p class="note" style="margin-top:18px">經文：CBETA T12n0366《佛說阿彌陀經》姚秦 鳩摩羅什譯（已去除校勘註碼）。白話與名詞解釋為本工具依通行說法整理，尚未逐條對照辭典，只是幫助理解，請以經文為準。</p></div>
+    <div class="rd-nav"><button class="pill" id="rdPrev">‹ 上一段</button><div id="rd-dots"></div><button class="pill" id="rdNext">下一段 ›</button></div>
+  </div>
+
+  <div id="v-rec" class="view pad">
+    <h2>誦經</h2>
+    <div id="rc-home">
+      <p class="note" id="rcIntro"></p>
+      <div class="tiles"><div class="tile"><b id="rcDue">0</b><span>待複習</span></div><div class="tile"><b id="rcNew">0</b><span>今日新段</span></div><div class="tile"><b id="rcKnown">0</b><span>已背</span></div></div>
+      <button class="big" id="rcStart">開始背誦</button>
+      <button class="big alt" id="rcMore" style="display:none">再多背一段</button>
+      <div class="rcmap" id="rcMap"></div>
+      <p class="note" id="rcNote"></p>
+      <h2 style="margin-top:16px">整部經典</h2>
+      <button class="fullbtn" id="fullGo"><img id="fullImg" alt=""><b>誦讀整部經</b><span id="fullSub"></span></button>
+    </div>
+    <div id="rc-card" style="display:none"></div>
+    <div id="rc-full" style="display:none"></div>
+  </div>
+
+  <div id="v-days" class="view pad">
+    <button class="pill" id="daysBack" style="margin-bottom:4px">‹ 返回</button>
+    <h2>修行記錄</h2>
+    <div class="tiles"><div class="tile"><b id="dToday">0</b><span>今日聲數</span></div><div class="tile"><b id="dWeek">0</b><span>本週</span></div><div class="tile"><b id="dTotal">0</b><span>累計</span></div></div>
+    <p class="note" id="streakNote"></p>
+    <div class="mhead"><button class="pill" id="mPrev">‹</button><b id="mTitle"></b><button class="pill" id="mNext">›</button></div>
+    <div class="cal" id="cal"></div>
+    <p class="note" id="dayDetail" style="text-align:center;min-height:20px"></p>
+    <h2>這七天</h2><div class="bars" id="bars"></div>
+    <h2>里程碑</h2><div class="ms" id="ms"></div>
+    <details class="plan"><summary>連續幾天的小計畫（選填）</summary>
+      <p class="note">經文說「執持名號，若一日……若七日」。想給自己一個期限就設；不想也沒關係，沒念的日子就空著，不比較、不催促。</p>
+      <div class="row"><label style="width:auto">天數</label><input type="number" id="dayN" min="1" max="49" value="7" style="width:80px"><button class="chip" id="dayGo">從今天開始</button></div>
+      <div class="days" id="dayGrid"></div><p class="note" id="dayNote"></p></details>
+  </div>
+
+  <div id="v-bless" class="view pad">
+    <div class="bl-pv"><canvas id="blCv" width="720" height="1000"></canvas></div>
+    <div class="seg" id="blTabs"><button data-p="bg" class="on">① 畫面</button><button data-p="line">② 祝福</button><button data-p="to">③ 給誰</button><button data-p="ly">④ 版型</button></div>
+    <div id="blPanel"></div>
+    <button class="big" id="blSave">儲存／分享這張卡</button>
+    <h2>迴向</h2>
+    <div class="box">願以此功德，普及於一切，<br>我等與眾生，皆共成佛道。
+      <div class="note">原型示意：偈文來源待確認為你工具既有的版本，確認前不當定稿。</div></div>
+    <p class="note">四句經文取自《佛說阿彌陀經》（CBETA T12n0366），已與 CBETA 線上閱讀頁逐字對過（2026-11-12）。迴向偈的來源待確認。</p>
+  </div>
+  <div class="mdl" id="mdl"><img id="mdlImg" alt=""><p class="note" style="text-align:center">長按圖片即可儲存；或按下載</p><a class="big" id="mdlDl" download="祝福卡.png">下載圖片</a><button class="big alt" id="mdlX">關閉</button></div>
+
+  <div class="tabs">
+    <button data-t="home" class="on"><svg viewBox="0 0 32 32"><path d="M5 15L16 6l11 9M8 13v13h16V13M13 26v-7h6v7"/></svg>首頁</button>
+    <button data-t="read"><svg viewBox="0 0 32 32"><path d="M16 9c-3-2-7-3-11-3v16c4 0 8 1 11 3 3-2 7-3 11-3V6c-4 0-8 1-11 3zM16 9v16"/></svg>讀經</button>
+    <button data-t="rec"><svg viewBox="0 0 32 32"><path d="M5 18a11 8 0 0 1 22 0c0 4-5 7-11 7S5 22 5 18zM11 18h10M22 8l3-3M10 8L7 5"/></svg>誦經</button>
+    <button data-t="count"><svg viewBox="0 0 32 32"><path d="M16 6c-3 3-4 7-4 10s1 5 4 7c3-2 4-4 4-7s-1-7-4-10zM16 23c-4-1-8-4-9-9 3 0 6 1 8 3M16 23c4-1 8-4 9-9-3 0-6 1-8 3M6 25h20"/></svg>念佛</button>
+    <button data-t="bless"><svg viewBox="0 0 32 32"><path d="M16 26c-6-4-9-8-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-3 8-9 12z"/></svg>迴向</button>
+  </div>
+</div>
+</div>
+
+<script>
+const N=108, TAU=Math.PI*2;
+const STYLES={
+  dark:{name:'深色大珠',desc:'附金屬隔珠',c:['#9a5a40','#5a2c1c','#2c140c'],k:1.0,spacer:'metal',mother:'metal'},
+  light:{name:'原木小珠',desc:'刻字母珠',c:['#f6e0b8','#d7b074','#a98048'],k:.88,spacer:null,mother:'carved'},
+  bodhi:{name:'菩提子',desc:'天然紋路',c:['#d9ac74','#a97c46','#6c4a26'],k:.95,spacer:null,mother:'gold',tex:true},
+  crystal:{name:'水晶／琉璃',desc:'通透',c:['#ffffff','#d5e9ef','#94bbc9'],k:.93,spacer:'gold',mother:'gold',glass:true}
+};
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('amt_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+             set(k,v){try{localStorage.setItem('amt_'+k,JSON.stringify(v))}catch(e){}}};
+const dstr=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+let S={bead:store.get('bead',null),hand:store.get('hand','R'),name:store.get('name','阿彌陀佛'),total:store.get('total',0),snd:store.get('snd',true)};
+let hist=store.get('hist',{}),plan=store.get('plan',null);
+const todayN=()=>hist[dstr()]||0;
+function rnd(j,i){const x=Math.sin(j*12.9898+i*78.233)*43758.5453;return x-Math.floor(x)}
+
+/* ---------- 一顆珠（有陰影、木紋、高光） ---------- */
+function drawBead(ctx,st,x,y,r,kind,j){
+  const s=STYLES[st];ctx.save();let c=s.c;
+  const metal=(kind==='spacer'?s.spacer:(kind==='mother'?s.mother:null));
+  if(metal==='metal')c=['#fbfbf8','#b4b7ba','#5f6469'];
+  if(metal==='gold')c=['#fff3c8','#dcb85e','#80601a'];
+  // 每顆略有色差
+  const v=(rnd(j,1)-.5)*.10;
+  // 落地陰影
+  ctx.shadowColor='rgba(70,35,15,.38)';ctx.shadowBlur=r*.55;ctx.shadowOffsetY=r*.28;ctx.shadowOffsetX=r*.06;
+  const g=ctx.createRadialGradient(x-r*.4,y-r*.42,r*.05,x+r*.05,y+r*.05,r*1.05);
+  g.addColorStop(0,c[0]);g.addColorStop(.5,c[1]);g.addColorStop(1,c[2]);
+  ctx.globalAlpha=(s.glass&&kind==='normal')?.9:1;
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  ctx.shadowColor='transparent';ctx.globalAlpha=1;
+  if(Math.abs(v)>0){ctx.fillStyle=v>0?`rgba(255,235,200,${v})`:`rgba(0,0,0,${-v})`;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
+  // 裁在珠內做紋理
+  ctx.save();ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.clip();
+  if(!metal&&!s.glass&&!s.tex){ // 木紋
+    ctx.strokeStyle='rgba(40,18,8,.16)';ctx.lineWidth=Math.max(.6,r*.05);
+    for(let i=0;i<5;i++){const o=(i-2)*r*.32+(rnd(j,i)-.5)*r*.12;ctx.beginPath();ctx.ellipse(x+o*.2,y+o,r*1.05,r*(.38+rnd(j,i+4)*.2),(rnd(j,i+9)-.5)*.5,0,Math.PI);ctx.stroke()}
+  }
+  if(s.tex&&!metal){ctx.fillStyle='rgba(60,35,15,.38)';
+    for(let i=0;i<11;i++){const a=rnd(j,i)*6.28,d=Math.sqrt(rnd(j,i+9))*r*.85;ctx.beginPath();ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,r*.05+rnd(j,i+3)*r*.08,0,7);ctx.fill()}}
+  if(s.glass&&!metal){ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=r*.08;ctx.beginPath();ctx.arc(x+r*.1,y+r*.1,r*.62,.2,2.4);ctx.stroke()}
+  // 下緣反光
+  const rl=ctx.createRadialGradient(x+r*.35,y+r*.5,0,x+r*.35,y+r*.5,r*.9);
+  rl.addColorStop(0,s.glass?'rgba(255,255,255,.35)':'rgba(255,215,170,.25)');rl.addColorStop(1,'rgba(255,215,170,0)');
+  ctx.fillStyle=rl;ctx.fillRect(x-r,y-r,r*2,r*2);
+  ctx.restore();
+  if(metal){ // 金屬刻紋
+    ctx.strokeStyle='rgba(40,40,45,.35)';ctx.lineWidth=Math.max(.6,r*.07);
+    ctx.beginPath();ctx.arc(x,y,r*.66,0,7);ctx.stroke();ctx.beginPath();ctx.arc(x,y,r*.38,0,7);ctx.stroke();
+    ctx.fillStyle='rgba(40,40,45,.4)';for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.arc(x+Math.cos(a)*r*.52,y+Math.sin(a)*r*.52,r*.06,0,7);ctx.fill()}
+  }
+  if(kind==='mother'&&s.mother==='carved'){ctx.fillStyle='rgba(95,55,20,.85)';ctx.font=`600 ${r*1.15}px "Noto Serif TC",serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('佛',x,y+r*.06)}
+  // 高光
+  ctx.fillStyle=s.glass?'rgba(255,255,255,.9)':'rgba(255,255,255,.42)';
+  ctx.beginPath();ctx.ellipse(x-r*.36,y-r*.42,r*.3,r*.17,-.7,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(x-r*.5,y-r*.28,r*.07,0,7);ctx.fill();
+  ctx.restore();
+}
+
+/* ---------- 選珠 ---------- */
+Object.keys(STYLES).forEach(k=>{
+  const s=STYLES[k],d=document.createElement('div');d.className='card';d.dataset.k=k;
+  d.innerHTML=`<canvas width="320" height="150"></canvas><b>${s.name}</b><span>${s.desc}</span>`;
+  $('#cards').appendChild(d);
+  const cx=d.querySelector('canvas').getContext('2d');
+  cx.strokeStyle='#b49478';cx.lineWidth=2;cx.beginPath();cx.moveTo(0,75);cx.lineTo(320,75);cx.stroke();
+  const R=26*s.k;
+  [[1,40,'normal'],[2,98,'normal'],[0,170,'mother'],[3,242,'normal'],[5,296,s.spacer?'spacer':'normal']].forEach(([j,x,kd])=>drawBead(cx,k,x,75,kd==='mother'?R*1.5:R,kd,j+k.length));
+  d.onclick=()=>{S.bead=k;markPick()};
+});
+function markPick(){document.querySelectorAll('.card').forEach(c=>c.classList.toggle('sel',c.dataset.k===S.bead));$('#go').disabled=!S.bead}
+function bindSeg(id,key){const seg=$(id);const sync=()=>seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[key]));
+  seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;sync();store.set(key,S[key])});sync()}
+bindSeg('#handSeg','hand');bindSeg('#nameSeg','name');
+$('#go').onclick=()=>{store.set('bead',S.bead);store.set('hand',S.hand);store.set('name',S.name);show('app');startCount();goTab('count')};
+function show(id){document.querySelectorAll('.screen,#app').forEach(s=>s.classList.toggle('on',s.id===id))}
+
+/* ---------- 珠環：36 顆（三轉 = 108） ---------- */
+const NB=36;
+const cv=$('#cv'),ctx=cv.getContext('2d');
+let W=0,H=0,dpr=1,cx0=0,cy0=0,A=0,B=0,LUT=[],PER=0,S0=0,SP=0,MIR=false;
+const X=x=>MIR?W-x:x;
+const HB=new Image(),HT=new Image();HB.src='assets/hand-base.png';HT.src='assets/hand-thumb.png';HB.onload=HT.onload=()=>draw();
+const HW=797,HH=796,PX=565,PY=250,PIV=[410,590],TB=[317,239]; // 手圖尺寸、捏持點、拇指支點、拇指層左上角
+function buildRing(){
+  B=Math.min(H*.30,W*.44);A=B*.98;cx0=W/2;cy0=H*.36;
+  LUT=[0];const M=720;let px=A,py=0;
+  for(let i=1;i<=M;i++){const t=i*TAU/M,x=A*Math.cos(t),y=B*Math.sin(t);LUT.push(LUT[i-1]+Math.hypot(x-px,y-py));px=x;py=y}
+  PER=LUT[M];SP=PER/NB;S0=sAt(Math.PI/2);
+  $('#info').style.top=cy0+'px';
+}
+function sAt(t){const M=720,f=((t%TAU)+TAU)%TAU/TAU*M,i=Math.floor(f);return LUT[i]+(LUT[Math.min(i+1,M)]-LUT[i])*(f-i)}
+function tAt(s){s=((s%PER)+PER)%PER;let lo=0,hi=720;while(hi-lo>1){const m=(lo+hi)>>1;LUT[m]<=s?lo=m:hi=m}return (lo+(s-LUT[lo])/(LUT[hi]-LUT[lo]))*TAU/720}
+const pt=t=>({x:cx0+A*Math.cos(t),y:cy0+B*Math.sin(t),d:Math.sin(t)});
+const spr={};
+function sprite(st,kind,r,j){
+  const vj=kind==='normal'?(j%5):0,q=Math.max(1,Math.round(r*2)/2),key=st+kind+q+dpr+vj,hit=spr[key];if(hit)return hit;
+  const sz=Math.ceil(q*3.2*dpr),c=document.createElement('canvas');c.width=c.height=sz;
+  const g=c.getContext('2d');g.scale(dpr,dpr);drawBead(g,st,sz/dpr/2,sz/dpr/2-q*.1,q,kind,vj+7);
+  return spr[key]={c,half:sz/dpr/2,dy:q*.1};
+}
+function kindOf(j){if(j===0)return'mother';if(j%12===0&&STYLES[S.bead].spacer)return'spacer';return'normal'}
+const bumpF=u=>u<.3?1-Math.pow(1-u/.3,2):1-(()=>{const k=(u-.3)/.7;return k*k*(3-2*k)})();
+let particles=[];
+function spawn(){
+  const f=pt(Math.PI/2);
+  for(let i=0;i<7;i++)particles.push({x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*8,vx:(Math.random()-.5)*.5,vy:-.35-Math.random()*.7,life:0,max:700+Math.random()*500,r:2+Math.random()*3});
+  particles.push({x:f.x,y:f.y,ring:1,life:0,max:520,r:6});
+}
+let pos=S.total,vel=0,thumbU=1,raf=0,last=0;
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  if(!S.bead||!W||!H||!isFinite(A)||!isFinite(B))return;
+  const st=STYLES[S.bead],mf=((pos%NB)+NB)%NB,front=pt(Math.PI/2);
+  ctx.strokeStyle='rgba(140,105,80,.7)';ctx.lineWidth=1.3;ctx.beginPath();
+  for(let i=0;i<=120;i++){const p=pt(i*TAU/120);i?ctx.lineTo(X(p.x),p.y):ctx.moveTo(X(p.x),p.y)}ctx.stroke();
+  if(mf>0.01){
+    ctx.save();ctx.lineCap='round';ctx.shadowColor='rgba(255,190,70,.95)';ctx.shadowBlur=22;
+    ctx.strokeStyle='rgba(255,212,115,.6)';ctx.lineWidth=SP*.85;ctx.beginPath();
+    const steps=Math.max(2,Math.ceil(mf*3));
+    for(let i=0;i<=steps;i++){const p=pt(tAt(S0+(i/steps)*mf*SP));i?ctx.lineTo(X(p.x),p.y):ctx.moveTo(X(p.x),p.y)}
+    ctx.stroke();ctx.restore();
+  }
+  const items=[];
+  for(let j=0;j<NB;j++){const t=tAt(S0+(mf-j)*SP),p=pt(t);items.push({j,x:p.x,y:p.y,t})}
+  for(const it of items){
+    const kd=kindOf(it.j),counted=it.j<mf;
+    let r=SP*.47*st.k;if(kd==='mother')r*=1.5;if(kd==='spacer')r*=.86;
+    if(kd==='mother'){
+      const ox=Math.cos(it.t),oy=Math.sin(it.t),bx=X(it.x+ox*r*1.9),by=it.y+oy*r*1.9;
+      ctx.strokeStyle='#c4543f';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(X(it.x),it.y);ctx.lineTo(bx,by);ctx.stroke();
+      ctx.fillStyle='#b84a38';ctx.beginPath();ctx.arc(bx,by,r*.32,0,7);ctx.fill();
+      for(let k=-3;k<=3;k++){const g=ctx.createLinearGradient(0,by,0,by+r*3.4);g.addColorStop(0,'#c4503c');g.addColorStop(1,'#ec9a84');
+        ctx.strokeStyle=g;ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(bx+k*.6,by+r*.2);ctx.quadraticCurveTo(bx+k*2.2,by+r*1.8,bx+k*2.8+Math.sin(performance.now()/700+k)*1.2,by+r*3.4);ctx.stroke()}
+    }
+    const sp=sprite(S.bead,kd,r,it.j);
+    ctx.drawImage(sp.c,X(it.x)-sp.half,it.y-sp.half+sp.dy,sp.half*2,sp.half*2);
+    if(counted){ctx.fillStyle='rgba(255,214,120,.26)';ctx.beginPath();ctx.arc(X(it.x),it.y,r,0,7);ctx.fill()}
+  }
+  // 微光粒子
+  for(const p of particles){
+    const k=p.life/p.max;if(k>=1)continue;
+    if(p.ring){ctx.strokeStyle=`rgba(255,205,110,${.55*(1-k)})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X(p.x),p.y,p.r+k*SP*2.2,0,7);ctx.stroke();continue}
+    const g=ctx.createRadialGradient(X(p.x),p.y,0,X(p.x),p.y,p.r*2.2);g.addColorStop(0,`rgba(255,226,150,${.9*(1-k)})`);g.addColorStop(1,'rgba(255,226,150,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(X(p.x),p.y,p.r*2.2,0,7);ctx.fill();
+  }
+  // 手：底層＋會動的拇指
+  if(HB.complete&&HB.naturalWidth&&HT.complete&&HT.naturalWidth){
+    const hs=Math.min(W*.92,460)/HW,b=bumpF(thumbU);
+    ctx.save();
+    ctx.translate(X(front.x)+(MIR?1:-1)*3*b*hs*2,front.y-PY*hs+1.5*b);
+    ctx.scale(MIR?-1:1,1);
+    ctx.drawImage(HB,-PX*hs,0,HW*hs,HH*hs);
+    ctx.translate((PIV[0]-PX)*hs,PIV[1]*hs);ctx.rotate(-b*5.5*Math.PI/180);
+    ctx.drawImage(HT,(TB[0]-PIV[0])*hs,(TB[1]-PIV[1])*hs,HT.naturalWidth*hs,HT.naturalHeight*hs);
+    ctx.restore();
+  }
+}
+function loop(t){
+  const dtms=Math.min(50,t-(last||t)),dt=Math.min(3,dtms/16.7);last=t;
+  const target=S.total;
+  vel+=(target-pos)*.17*dt;vel*=Math.pow(.74,dt);pos+=vel*dt;
+  if(thumbU<1)thumbU=Math.min(1,thumbU+dtms/380);
+  particles.forEach(p=>{p.life+=dtms;if(!p.ring){p.x+=p.vx*dtms*.06;p.y+=p.vy*dtms*.06}});
+  particles=particles.filter(p=>p.life<p.max);
+  draw();
+  if(Math.abs(target-pos)<.002&&Math.abs(vel)<.002&&thumbU>=1&&!particles.length){pos=target;vel=0;draw();raf=0;last=0;return}
+  raf=requestAnimationFrame(loop);
+}
+const kick=()=>{if(!raf){last=0;raf=requestAnimationFrame(loop)}};
+function resize(){const r=cv.getBoundingClientRect();if(!r.width)return;
+  dpr=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;buildRing();draw()}
+
+/* ---------- 計數 ---------- */
+function render(){const m=((S.total%N)+N)%N;
+  $('#n').textContent=m;$('#third').textContent=['●○○','○●○','○○●'][Math.floor(m/36)%3].split('').join(' ');$('#sToday').textContent=todayN();$('#sTotal').textContent=S.total.toLocaleString();
+  $('#sRound').textContent=Math.floor(S.total/N);$('#nm').textContent=S.name}
+function save(){store.set('total',S.total);store.set('hist',hist)}
+let ac;
+function click(){return;try{
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  const t=ac.currentTime,out=ac.createGain();out.gain.value=.55;out.connect(ac.destination);
+  // 木珠相碰：極短的噪音敲擊，經帶通濾波成「叩」的木質感
+  const len=Math.floor(ac.sampleRate*.05),buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
+  const ns=ac.createBufferSource();ns.buffer=buf;
+  const bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1300+Math.random()*250;bp.Q.value=2.2;
+  const g1=ac.createGain();g1.gain.setValueAtTime(.9,t);g1.gain.exponentialRampToValueAtTime(.001,t+.05);
+  ns.connect(bp).connect(g1).connect(out);ns.start(t);
+  // 低沉的木頭共鳴，音高固定不滑動，微小隨機避免機械感
+  const o=ac.createOscillator(),g2=ac.createGain(),lp=ac.createBiquadFilter();
+  o.type='triangle';o.frequency.value=215+Math.random()*25;lp.type='lowpass';lp.frequency.value=700;
+  g2.gain.setValueAtTime(.0001,t);g2.gain.exponentialRampToValueAtTime(.35,t+.004);g2.gain.exponentialRampToValueAtTime(.001,t+.11);
+  o.connect(lp).connect(g2).connect(out);o.start(t);o.stop(t+.12);
+}catch(e){}}
+function bump(){const n=$('#n');n.classList.remove('pop');void n.offsetWidth;n.classList.add('pop')}
+function add(){
+  S.total++;hist[dstr()]=todayN()+1;save();render();bump();click();
+  if(navigator.vibrate)navigator.vibrate(8);
+  if(S.total%N===0){const h=$('#hint');h.textContent='一圈圓滿，隨喜功德';setTimeout(()=>h.textContent='點畫面任何地方，撥一顆',3500)}
+  thumbU=0;spawn();kick();
+}
+function undo(){if(S.total<=0||todayN()<=0)return;S.total--;hist[dstr()]=todayN()-1;save();render();kick()}
+function startCount(){MIR=S.hand==='L';pos=S.total;vel=0;render();setTimeout(resize,0)}
+$('#v-count').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();add()});
+$('#undo').onclick=undo;
+function syncHand(){document.querySelectorAll('#handQuick button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.hand))}
+document.querySelectorAll('#handQuick button').forEach(b=>b.onclick=()=>{S.hand=b.dataset.v;store.set('hand',S.hand);MIR=S.hand==='L';syncHand();resize()});
+syncHand();
+$('#back').onclick=()=>{show('pick');markPick();bindSeg('#handSeg','hand');bindSeg('#nameSeg','name')};
+let wl=null;
+$('#wake').onclick=async()=>{const b=$('#wake');try{if(wl){await wl.release();wl=null;b.textContent='常亮 關';return}wl=await navigator.wakeLock.request('screen');b.textContent='常亮 開'}catch(e){b.textContent='此裝置不支援'}};
+window.addEventListener('resize',resize);
+
+function goTab(t){
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+t));
+  if(t==='count')setTimeout(resize,0);
+  if(t==='days')renderDays();
+  if(t==='read')renderRead();
+  if(t==='rec')renderRec();
+  if(t==='bless')renderBless();
+  if(t==='home')renderHome();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>goTab(b.dataset.t));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goTab(b.dataset.go));
+$('#toDays').onclick=()=>goTab('days');$('#daysBack').onclick=()=>goTab('count');
+$('#hmSt').onclick=()=>goTab('days');
+$('#hmNext').onclick=()=>goTab('read');
+$('#pickBack').onclick=()=>{show('app');goTab('count')};
+
+
+const UNITS=[{"title": "通序：地點與聽眾", "line": "0346b28", "sutra": "如是我聞：\n一時，佛在舍衛國祇樹給孤獨園，與大比丘僧千二百五十人俱，皆是大阿羅漢，眾所知識。長老舍利弗、摩訶目乾連、摩訶迦葉、摩訶迦栴延、摩訶拘絺羅、離婆多、周梨槃陀迦、難陀、阿難陀、羅睺羅、憍梵波提、賓頭盧頗羅墮、迦留陀夷、摩訶劫賓那、薄俱羅、阿㝹樓馱，如是等諸大弟子，并諸菩薩摩訶薩——文殊師利法王子、阿逸多菩薩、乾陀訶提菩薩、常精進菩薩——與如是等諸大菩薩，及釋提桓因等無量諸天大眾俱。", "plain": "這是我親耳聽佛陀說的。那時，佛陀在舍衛國的祇樹給孤獨園，和一千二百五十位大比丘在一起，他們都是已證阿羅漢果、大家都認識的聖者。還有文殊師利等大菩薩，以及釋提桓因帶領的無數天人，一起來聽法。", "gist": "一場很多人聚在一起的聽法，故事從這裡開始。"}, {"title": "別序：西方有極樂", "line": "0346c10", "sutra": "爾時，佛告長老舍利弗：\n「從是西方過十萬億佛土，有世界名曰極樂。其土有佛，號阿彌陀，今現在說法。", "plain": "這時，佛陀對長老舍利弗說：從這裡往西，經過十萬億個佛的國土，有一個世界叫「極樂」。那裡有一位佛，名叫阿彌陀，現在正在說法。", "gist": "佛陀指向西方：那裡有個世界，叫極樂。"}, {"title": "極樂之名：沒有苦，只有樂", "line": "0346c10", "sutra": "舍利弗！彼土何故名為極樂？其國眾生無有眾苦，但受諸樂，故名極樂。又舍利弗！極樂國土，七重欄楯、七重羅網、七重行樹，皆是四寶周匝圍繞，是故彼國名曰極樂。", "plain": "為什麼叫極樂？因為那個國土的眾生沒有各種苦，只有種種安樂，所以叫極樂。那裡有七重欄杆、七重寶網、七重行樹，都由四種寶物圍繞，所以那個國土叫極樂。", "gist": "極樂的意思：沒有眾苦，但受諸樂。"}, {"title": "七寶池與蓮花", "line": "0346c16", "sutra": "又舍利弗！極樂國土有七寶池，八功德水充滿其中，池底純以金沙布地。四邊階道，金、銀、琉璃、頗梨合成；上有樓閣，亦以金、銀、琉璃、頗梨、車𤦲、赤珠、馬瑙而嚴飾之。池中蓮花，大如車輪，青色青光，黃色黃光，赤色赤光，白色白光，微妙香潔。舍利弗！極樂國土成就如是功德莊嚴。", "plain": "極樂國土有用七寶砌成的池子，池裡充滿具有八種功德的水，池底鋪滿金沙。池的四邊有階梯，由金、銀、琉璃、頗梨合成；上面有樓閣，用七寶來莊嚴。池中的蓮花大如車輪，青色的放青光，黃色的放黃光，紅色的放紅光，白色的放白光，美妙、芬芳、潔淨。", "gist": "一個有水、有光、有蓮花的池。"}, {"title": "天樂、花雨與清晨供養", "line": "0347a07", "sutra": "又舍利弗！彼佛國土，常作天樂，黃金為地，晝夜六時，天雨曼陀羅華。其國眾生，常以清旦，各以衣裓盛眾妙華，供養他方十萬億佛；即以食時，還到本國，飯食經行。舍利弗！極樂國土成就如是功德莊嚴。", "plain": "那個佛國常有天上的音樂，大地是黃金，晝夜六個時段都有曼陀羅花從天落下。那裡的眾生每天清晨，用衣襟盛著美妙的花，去供養其他地方的十萬億佛；到了用餐時間，就回到自己的國土吃飯、經行。", "gist": "早上供養，回來吃飯、散步——很日常的一天。"}, {"title": "眾鳥與風樹說法", "line": "0347a12", "sutra": "復次舍利弗！彼國常有種種奇妙雜色之鳥——白鵠、孔雀、鸚鵡、舍利、迦陵頻伽、共命之鳥。是諸眾鳥，晝夜六時出和雅音，其音演暢五根、五力、七菩提分、八聖道分如是等法。其土眾生聞是音已，皆悉念佛、念法、念僧。舍利弗！汝勿謂此鳥實是罪報所生。所以者何？彼佛國土無三惡趣。舍利弗！其佛國土尚無三惡道之名，何況有實？是諸眾鳥，皆是阿彌陀佛欲令法音宣流，變化所作。舍利弗！彼佛國土微風吹動，諸寶行樹及寶羅網出微妙音，譬如百千種樂同時俱作，聞是音者，皆自然生念佛、念法、念僧之心。舍利弗！其佛國土成就如是功德莊嚴。", "plain": "那裡常有各種奇妙、顏色繽紛的鳥，如白鵠、孔雀、鸚鵡、舍利、迦陵頻伽、共命之鳥。這些鳥日夜六時發出和諧優雅的聲音，演說五根、五力、七菩提分、八聖道分等法。眾生聽到這些聲音，都會想到念佛、念法、念僧。不要以為這些鳥是罪業果報生出來的，因為那個國土沒有三惡道，連三惡道的名字都沒有，哪裡會真有？這些鳥是阿彌陀佛為了讓法音流傳而變化出來的。微風吹動寶樹和寶網，發出美妙的聲音，像百千種樂器同時演奏，聽到的人自然生起念佛、念法、念僧的心。", "gist": "連鳥鳴與風聲，都在說法。"}, {"title": "阿彌陀：光明無量、壽命無量", "line": "0347a25", "sutra": "舍利弗！於汝意云何？彼佛何故號阿彌陀？舍利弗！彼佛光明無量，照十方國無所障礙，是故號為阿彌陀。又舍利弗！彼佛壽命及其人民，無量無邊阿僧祇劫，故名阿彌陀。舍利弗！阿彌陀佛成佛已來，於今十劫。又舍利弗！彼佛有無量無邊聲聞弟子，皆阿羅漢，非是算數之所能知；諸菩薩，亦復如是。舍利弗！彼佛國土成就如是功德莊嚴。", "plain": "舍利弗，你覺得呢？那位佛為什麼叫阿彌陀？因為他的光明無量，照亮十方國土沒有任何阻礙，所以叫阿彌陀。另外，那位佛和那裡人民的壽命，都是無量無邊阿僧祇劫，所以也叫阿彌陀。阿彌陀佛成佛到現在已經十劫。他有無數的聲聞弟子，都是阿羅漢，多到無法用算數知道；菩薩也是這樣。", "gist": "名字的意思：光無量，壽無量。"}, {"title": "聖眾與發願", "line": "0347b04", "sutra": "又舍利弗！極樂國土眾生生者，皆是阿鞞跋致。其中多有一生補處，其數甚多，非是算數所能知之，但可以無量無邊阿僧祇劫說。舍利弗！眾生聞者，應當發願，願生彼國。所以者何？得與如是諸上善人俱會一處。", "plain": "往生到極樂國土的眾生，都是阿鞞跋致，也就是不退轉。其中有很多是一生補處（再一生就能成佛的菩薩），數量多到無法計算，只能說是無量無邊阿僧祇劫那麼多。舍利弗，聽到這些的眾生，應當發願往生那個國土。為什麼呢？因為可以和這樣的上善人聚在一處。", "gist": "發願的理由：能和那麼多好人在一起。"}, {"title": "往生條件：不是少善根", "line": "0347b09", "sutra": "舍利弗！不可以少善根福德因緣得生彼國。", "plain": "舍利弗，不能憑著少少的善根、福德因緣，就往生到那個國土。", "gist": "往生需要善根、福德、因緣的累積。"}, {"title": "執持名號，一心不亂", "line": "0347b09", "sutra": "舍利弗！若有善男子、善女人，聞說阿彌陀佛，執持名號，若一日、若二日、若三日、若四日、若五日、若六日、若七日，一心不亂。其人臨命終時，阿彌陀佛與諸聖眾，現在其前。是人終時，心不顛倒，即得往生阿彌陀佛極樂國土。舍利弗！我見是利，故說此言。若有眾生聞是說者，應當發願生彼國土。", "plain": "如果有善男子、善女人，聽說阿彌陀佛，就把這個名號牢牢記住、持念不忘，一天、兩天、三天……直到七天，都一心不亂。這個人臨命終時，阿彌陀佛和諸位聖者會出現在他面前。這個人臨終時心不顛倒，就能往生阿彌陀佛的極樂國土。舍利弗，我看見這樣的利益，所以才說這些話。如果有眾生聽到這個說法，應當發願往生那個國土。", "gist": "持名號：把名號放在心上，從一天開始，數量由自己定。"}, {"title": "六方諸佛的讚歎", "line": "0347b18", "sutra": "舍利弗！如我今者，讚歎阿彌陀佛不可思議功德；東方亦有阿閦鞞佛、須彌相佛、大須彌佛、須彌光佛、妙音佛，如是等恒河沙數諸佛，各於其國出廣長舌相，遍覆三千大千世界，說誠實言：『汝等眾生，當信是稱讚不可思議功德一切諸佛所護念經。』\n舍利弗！南方世界有日月燈佛、名聞光佛、大焰肩佛、須彌燈佛、無量精進佛，如是等恒河沙數諸佛，各於其國出廣長舌相，遍覆三千大千世界，說誠實言：『汝等眾生，當信是稱讚不可思議功德一切諸佛所護念經。』\n舍利弗！西方世界有無量壽佛、無量相佛、無量幢佛、大光佛、大明佛、寶相佛、淨光佛，如是等恒河沙數諸佛，各於其國出廣長舌相，遍覆三千大千世界，說誠實言：『汝等眾生，當信是稱讚不可思議功德一切諸佛所護念經。』\n舍利弗！北方世界有焰肩佛、最勝音佛、難沮佛、日生佛、網明佛，如是等恒河沙數諸佛，各於其國出廣長舌相，遍覆三千大千世界，說誠實言：『汝等眾生，當信是稱讚不可思議功德一切諸佛所護念經。』\n舍利弗！下方世界有師子佛、名聞佛、名光佛、達摩佛、法幢佛、持法佛，如是等恒河沙數諸佛，各於其國出廣長舌相，遍覆三千大千世界，說誠實言：『汝等眾生，當信是稱讚不可思議功德一切諸佛所護念經。』\n舍利弗！上方世界有梵音佛、宿王佛、香上佛、香光佛、大焰肩佛、雜色寶華嚴身佛、娑羅樹王佛、寶華德佛、見一切義佛、如須彌山佛，如是等恒河沙數諸佛，各於其國出廣長舌相，遍覆三千大千世界，說誠實言：『汝等眾生，當信是稱讚不可思議功德一切諸佛所護念經。』", "plain": "就像我現在讚歎阿彌陀佛的不可思議功德一樣，東、南、西、北、下、上六個方向，也各有像恒河沙那麼多的佛（經中列出各方佛的名號）。他們各自在自己的國土伸出廣長舌相，遍覆三千大千世界，說著誠實的話：你們眾生，應當相信這部稱讚不可思議功德、被一切諸佛護念的經。", "gist": "六個方向的佛，同聲說：要相信。"}, {"title": "為什麼叫「一切諸佛所護念經」", "line": "0348a07", "sutra": "舍利弗！於汝意云何？何故名為『一切諸佛所護念經』？舍利弗！若有善男子、善女人，聞是經受持者，及聞諸佛名者；是諸善男子、善女人，皆為一切諸佛共所護念，皆得不退轉於阿耨多羅三藐三菩提。是故舍利弗！汝等皆當信受我語及諸佛所說。", "plain": "舍利弗，你覺得呢？為什麼叫「一切諸佛所護念經」？如果有善男子、善女人，聽到這部經並且受持，以及聽到諸佛名號，這些人都會被一切諸佛共同護念，都不會退失無上正等正覺的道心。所以舍利弗，你們都應當相信、接受我所說的話，以及諸佛所說的。", "gist": "被諸佛護念，道心不退。"}, {"title": "勸願：信願與不退轉", "line": "0348a13", "sutra": "舍利弗！若有人已發願、今發願、當發願，欲生阿彌陀佛國者；是諸人等，皆得不退轉於阿耨多羅三藐三菩提，於彼國土若已生、若今生、若當生。是故舍利弗！諸善男子、善女人若有信者，應當發願生彼國土。", "plain": "舍利弗，如果有人已經發願、現在發願、將來發願，想往生阿彌陀佛的國土，這些人都不會退失無上正等正覺的道心，無論是已經往生、正在往生，或將要往生。所以舍利弗，善男子、善女人如果有信，就應當發願往生那個國土。", "gist": "發願不論早晚，都不退轉。"}, {"title": "難信之法：五濁惡世", "line": "0348a18", "sutra": "舍利弗！如我今者，稱讚諸佛不可思議功德；彼諸佛等，亦稱說我不可思議功德，而作是言：『釋迦牟尼佛能為甚難希有之事，能於娑婆國土五濁惡世，劫濁、見濁、煩惱濁、眾生濁、命濁中，得阿耨多羅三藐三菩提，為諸眾生說是一切世間難信之法。』舍利弗！當知我於五濁惡世行此難事，得阿耨多羅三藐三菩提，為一切世間說此難信之法，是為甚難！」", "plain": "就像我稱讚諸佛的不可思議功德，諸佛也稱讚我：釋迦牟尼佛能做很難、很稀有的事，能在娑婆世界的五濁惡世——劫濁、見濁、煩惱濁、眾生濁、命濁之中，證得無上正等正覺，為眾生說這一切世間難以相信的法。舍利弗，要知道我在五濁惡世做這件難事，為一切世間說這難信之法，這是非常困難的。", "gist": "這個法難信，說的人也不容易。"}, {"title": "流通：歡喜信受", "line": "0348a26", "sutra": "佛說此經已，舍利弗及諸比丘，一切世間天、人、阿修羅等，聞佛所說，歡喜信受，作禮而去。", "plain": "佛陀說完這部經，舍利弗和諸位比丘，以及一切世間的天人、人、阿修羅，聽了佛所說的，都歡喜信受，行禮後離去。", "gist": "聽完，歡喜，帶著它回到生活。"}];
+const GLOSS={"1": [["如是我聞", "佛經開頭的固定句，意思是「我（阿難）親耳聽佛這樣說」。傳統說法是佛滅後弟子結集經典，由阿難誦出，所以每部經都以此開頭，表示內容有所本。"], ["祇樹給孤獨園", "又稱祇園精舍。「祇樹」是祇陀太子的樹林，「給孤獨」是長者須達多的稱號（意思是接濟孤苦的人）。經律記載須達多向祇陀太子買下園地，供養佛陀作說法的精舍。"], ["大阿羅漢", "阿羅漢是聲聞修行的最高果位，已斷盡煩惱、不再輪迴生死；「大」是尊稱。「眾所知識」是說大家都認識、敬重他們。"], ["舍利弗", "佛弟子中「智慧第一」。本經屬「無問自說」，沒有人發問，佛陀主動向舍利弗開示。"], ["其他列名弟子", "目犍連（神通第一）、摩訶迦葉（頭陀行第一）、阿難（多聞第一）、羅睺羅（佛陀之子，密行第一）等，都是佛陀座下知名的弟子。"], ["法王子", "菩薩的尊稱，意思是佛法之王（佛）的繼承者。文殊師利代表智慧；阿逸多是彌勒菩薩，被視為未來成佛的菩薩。"]], "2": [["長老", "對年高德重者的尊稱。"], ["十萬億佛土", "「佛土」是一尊佛教化的世界。十萬億佛土傳統上視為「非常遙遠」的表達，不必當作精確里程。"], ["極樂", "梵語 Sukhāvatī 的意譯，意思是「安樂」。經文接著就解釋：因為那裡的眾生沒有眾苦、只有諸樂。"], ["今現在說法", "經文說阿彌陀佛「現在」仍在說法，表示極樂世界是持續存在、有佛說法的地方，不是遠古傳說。"]], "3": [["欄楯", "欄杆。七重欄楯、七重羅網、七重行樹（成行的樹），「七重」是層層圍繞、整齊莊嚴的意思。"], ["羅網", "用寶物串成的網，罩在樹與樓閣之上。"], ["四寶周匝圍繞", "欄杆、寶網、行樹都由金、銀、琉璃、玻璃四種寶物圍繞裝飾。"], ["沒有苦只有樂", "經文自己解釋「極樂」的由來：那裡的眾生沒有各種苦，只有種種安樂。"]], "4": [["七寶", "本經列為金、銀、琉璃、玻璃、硨磲、赤珠、瑪瑙。琉璃一般指青色寶石，玻璃（頗梨）常解作水晶，硨磲是大型海貝製成的寶物，赤珠是紅色寶珠；各寶的確切所指，歷來說法不一。"], ["八功德水", "水具足八種優點。常見的列法是：澄淨、清冷、甘美、輕軟、潤澤、安和、除飢渴等患、長養諸根（經文只說「八功德水」，細目出自注疏）。"], ["蓮華", "佛教以蓮花象徵清淨——生在泥水中而不染。經文寫蓮花大如車輪，各色各放光，是以光明與香潔表現清淨。"]], "5": [["天樂", "天上的音樂。「常作天樂」表示那裡時時有美妙的聲音。"], ["曼陀羅華", "梵語 mandārava，天界的花，意譯有「適意花」「天妙花」。"], ["晝夜六時", "古印度把一天分成六時：白天三時、夜晚三時。"], ["衣裓", "衣襟；一說是盛花的器具。眾生用它盛花供養他方諸佛。"], ["經行", "在一定範圍內來回行走，調和身心的修行方式（類似行禪）。"]], "6": [["迦陵頻伽", "妙音鳥，歌聲美妙。其他如白鵠（天鵝類）、孔雀、鸚鵡、共命之鳥（一身兩頭的鳥）。「舍利」是鳥名，舍利弗的名字相傳即「舍利鳥之子」。"], ["五根、五力", "五根是信、進（精進）、念、定、慧；同樣五項，增強到能破除障礙時稱「五力」。"], ["七菩提分、八聖道分", "七菩提分是念、擇法、精進、喜、輕安、定、捨；八聖道分是正見、正思惟、正語、正業、正命、正精進、正念、正定。合稱「三十七道品」的一部分，是修行的基本綱目。"], ["非罪報所生", "經文特別說明，這些鳥不是因為罪業才投生為鳥，而是阿彌陀佛為了讓法音流傳而變化所作。"]], "7": [["阿彌陀", "梵語 Amitābha（無量光）與 Amitāyus（無量壽）都可譯成「阿彌陀」，所以經文說祂光明無量、壽命無量。"], ["阿僧祇劫", "阿僧祇意思是「無數」，劫是極長的時間單位。「無量無邊阿僧祇劫」形容壽命長到無法計算。"], ["十劫", "經文說阿彌陀佛成佛至今已有十劫，也就是祂已經成佛、現在正在說法。"], ["無所障礙", "光明照遍十方國土而沒有任何阻礙。"]], "8": [["阿鞞跋致", "梵語 avaivartika，意譯「不退轉」，指修行不再退失。"], ["一生補處", "只要再一生就能成佛、接補佛位的菩薩，彌勒菩薩是最常被提到的例子。"], ["聲聞與菩薩", "聲聞是聽聞佛陀教導而修證的弟子；菩薩是發願度眾生、成就佛道的修行人。"], ["發願", "在心中立下堅定的志向。本經要求聽聞的人「應當發願，願生彼國」，這是信、願、行三項之一。"]], "9": [["善根", "善的根本，例如無貪、無瞋、無癡。"], ["福德", "行善所累積的福報與功德。"], ["因緣", "促成結果的原因（因）與條件（緣）。"], ["多善根福德", "蕅益大師《阿彌陀經要解》的說法：阿彌陀佛的大願是眾生多善根的「因」，大行是多福德的「緣」；信願持名這件事本身，就是多善根福德。（這是注疏的解釋，經文只說不可少善根。）"]], "10": [["執持名號", "「執」是牢牢記住，「持」是不斷念誦；名號指「阿彌陀佛」。"], ["若一日…若七日", "時間長短依各人，一天到七天；重點是「一心」，不是天數。"], ["一心不亂", "念佛念到心專一而不散亂。蓮池大師分「事一心」與「理一心」兩層；聖嚴法師以禪法說明：事一心像統一心（入定），理一心像無心（不執著）。"], ["現在其前", "臨命終時，阿彌陀佛與諸聖眾顯現在面前。"], ["心不顛倒", "臨終時心不慌亂、不迷失，清明地隨佛接引。"]], "11": [["恆河沙", "恆河沙粒極多，用來形容數量多到數不盡。"], ["六方", "東、南、西、北、下、上六個方向；每個方向都有如恆河沙數的佛同聲讚歎。"], ["廣長舌相", "佛三十二相之一：舌頭廣而長，能覆蓋面部，象徵所說真實不虛。"], ["三千大千世界", "古印度宇宙觀：一千個小世界為小千，千個小千為中千，千個中千為大千，合稱三千大千世界，形容極大的範圍。"], ["不可思議", "不是「不可能」，而是超出一般思考與語言所能形容。"]], "12": [["護念", "「護」是保護，「念」是關懷記掛，指受諸佛守護關懷。"], ["經的別名", "「一切諸佛所護念經」是本經另一個名稱；玄奘法師另有譯本，名《稱讚淨土佛攝受經》（T12n0367）。"]], "13": [["阿耨多羅三藐三菩提", "梵語 anuttara-samyak-sambodhi，意譯「無上正等正覺」，即佛的究竟智慧。"], ["已發願、今發願、當發願", "過去、現在、未來發願的人都包含在內。"], ["不退轉", "修行的方向不再倒退。與第八段「阿鞞跋致」同義。"]], "14": [["五濁惡世", "五種污濁：劫濁（時代動亂）、見濁（邪見盛行）、煩惱濁（貪瞋癡熾盛）、眾生濁（眾生品質低落、多苦）、命濁（壽命短促）。"], ["娑婆世界", "梵語 sahā，意譯「堪忍」，指我們這個要忍受許多苦的世界。"], ["難信之法", "「難」是不容易相信：要相信有極樂世界、相信念佛可往生，並不容易，所以說是難信之法。"]], "15": [["阿修羅", "天龍八部之一，個性好鬥的神道眾生。"], ["天、人、阿修羅", "六道裡三善道的眾生，表示聽法的對象不只是人，而是一切世間。"], ["歡喜信受，作禮而去", "聽了歡喜、相信、接受，行禮後離開——整部經在平靜中結束。"]]};
+const SY={"2": {"t": "為什麼要有極樂世界？", "pts": ["釋迦牟尼佛介紹西方極樂世界的阿彌陀佛，是因為娑婆世界誘惑多、障礙多，不容易順利修行。", "阿彌陀佛有宏大的慈悲願力，凡是有意願往生的眾生，祂都會接引；到了那裡，處在很好的環境中修行。"], "src": "聖嚴法師〈心淨國土淨〉（選自《禪與悟》），法鼓山電視弘法文稿 2013.03。以上為改寫摘要。"}, "3": {"t": "心淨國土淨", "pts": ["聖嚴法師說，我們所處的環境其實是心境的寫照：心中歡喜時，所見的世界比較美滿；心有煩惱苦悶時，環境就不盡如意。", "「心淨國土淨」出自《維摩經·佛國品》的「隨其心淨則佛土淨」，意思是心清淨後，環境也跟著清淨。", "他也說，到目前為止，我們這個世界還不能稱為淨土世界；在未成佛、未解脫之前，心會隨境轉，心也能改變環境。"], "src": "聖嚴法師〈心淨國土淨〉（選自《禪與悟》），法鼓山電視弘法文稿 2013.03。以上為改寫摘要。"}, "4": {"t": "人間淨土與經中的淨土", "pts": ["研究者整理聖嚴法師的「人間淨土」思想時指出：他的人間淨土，不是把《阿彌陀經》等經所描述的淨土景象搬到今天的地球，而是以「提昇人的品質，建設人間淨土」為方向。"], "src": "臺大佛學數位圖書館收錄的一篇聖嚴人間淨土思想研究摘要（研究者的整理，不是聖嚴法師的原文）。"}, "8": {"t": "發願", "pts": ["聖嚴法師說，發願是一種心態、一種生活態度，也是生命的方向。", "在今生受報還願之中，少造惡業、多發悲願，就是福智雙行、自利利人，既提昇自己，也淨化社會。"], "src": "聖嚴法師〈發願，找到生命的方向〉，法鼓山電視弘法文稿 2012.06。以上為改寫摘要。"}, "10": {"t": "一心不亂：事一心與理一心", "pts": ["聖嚴法師把念佛看成禪法的一個項目：一向專念阿彌陀佛，念到一心不亂。", "事一心就是統一心，定境現前、已經入定；理一心則是禪修最後到達的無心——心不執著、不顛倒、不貪戀、不攀緣，也就是《金剛經》所說的「應無所住而生其心」。"], "src": "聖嚴法師《聖嚴法師教淨土法門》（法鼓文化，2010）頁 187、195，轉引自《臺大佛學研究》第 40 期論文。以上為改寫摘要。"}, "13": {"t": "發願", "pts": ["聖嚴法師說，發願是一種心態、一種生活態度，也是生命的方向。", "不違背自己身心的安定、健康，以及大眾的幸福，才是人生的大方向。"], "src": "聖嚴法師〈發願，找到生命的方向〉，法鼓山電視弘法文稿 2012.06。以上為改寫摘要。"}};
+let rdI=store.get('rdI',0),rdFs=store.get('rdFs',1);
+function renderRead(){
+  const u=UNITS[rdI];$('#rd-title').textContent=`${rdI+1}．${u.title}`;
+  $('#rd-ln').textContent=`T12n0366　${u.line}`;$('#rd-gist').textContent=u.gist;
+  const fx=u.sutra.includes('車𤦲');$('#rd-sutra').textContent=u.sutra.replace('車𤦲','硨磲')+(fx?'\n\n（CBETA 底本此字作「車𤦲」，手機字型常缺，這裡改寫為通行的「硨磲」。）':'');$('#rd-plain').textContent=u.plain;$('#rd-body').scrollTop=0;
+  const art=$('#rd-art');art.querySelectorAll('img').forEach(x=>x.remove());
+  art.style.backgroundPosition=['100% 0%','70% 20%','0% 40%','100% 10%','90% 0%','60% 15%'][rdI%6];
+  const im=new Image();im.onload=()=>{art.prepend(im);$('#rd-ph').textContent=''};im.onerror=()=>{$('#rd-ph').textContent='（本段繪圖製作中）'};
+  const rk='u'+String(rdI+1).padStart(2,'0');im.src=(window.READ_IMG||{})[rk]||`assets/read/${rk}.jpg`;
+  const gl=GLOSS[rdI+1]||[];$('#rd-gl').innerHTML=gl.map(([a,b])=>`<details><summary>${a}</summary><p>${b}</p></details>`).join('');
+  const sy=SY[rdI+1];$('#rd-sy').innerHTML=sy?`<div class="sy"><h4>聖嚴法師怎麼說</h4><b>${sy.t}</b><ul>${sy.pts.map(x=>`<li>${x}</li>`).join('')}</ul><div class="src">${sy.src}</div></div>`:'';
+  $('#rd-dots').innerHTML=UNITS.map((_,i)=>`<i class="${i===rdI?'on':''}"></i>`).join('');
+  $('#rdPrev').style.visibility=rdI?'visible':'hidden';$('#rdNext').style.visibility=rdI<UNITS.length-1?'visible':'hidden';
+  document.documentElement.style.setProperty('--fs',rdFs);store.set('rdI',rdI);
+}
+$('#rdPrev').onclick=()=>{if(rdI>0){rdI--;renderRead()}};
+$('#rdNext').onclick=()=>{if(rdI<UNITS.length-1){rdI++;renderRead()}};
+renderRead();
+$('#fsm').onclick=()=>{rdFs=Math.max(.85,rdFs-.1);store.set('rdFs',rdFs);renderRead()};
+$('#fbg').onclick=()=>{rdFs=Math.min(1.6,rdFs+.1);store.set('rdFs',rdFs);renderRead()};
+let sx=null;
+$('#v-read').addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+$('#v-read').addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>70){dx<0?$('#rdNext').click():$('#rdPrev').click()}});
+
+/* ---------- 背誦（每天約 100 字）／整部經典 ---------- */
+const recd=store.get('recd',{}),recU=store.get('recU',{}),cards=store.get('cards2',{}),newd=store.get('newd2',{});
+let recAll=store.get('recAll',0);
+const saveRec=()=>{store.set('recd',recd);store.set('recU',recU);store.set('cards2',cards);store.set('newd2',newd)};
+const PUNRE=/[，。；：！？、「」『』（）\s—]/g,cnt=x=>x.replace(PUNRE,'').length;
+const CARDS=[];
+(function(){
+  const sents=[];
+  UNITS.forEach((u,i)=>{
+    const t=u.sutra.replace(/\s+/g,'').replace('車𤦲','硨磲');
+    t.split(/(?<=[。！？])/).filter(Boolean).forEach(x=>{
+      if(cnt(x)<=130){sents.push([i,x]);return}
+      let parts=x.split(/(?<=[；：])/).filter(Boolean);
+      parts=parts.flatMap(y=>cnt(y)>130?y.split(/(?<=[，—、])/).filter(Boolean):[y]);
+      let cur='';parts.forEach(y=>{if(cur&&cnt(cur+y)>115){sents.push([i,cur]);cur=''}cur+=y});if(cur)sents.push([i,cur]);
+    });
+  });
+  let cur=[],n=0;const flush=()=>{if(cur.length){CARDS.push(cur);cur=[];n=0}};
+  sents.forEach(([i,x])=>{const c=cnt(x);if(cur.length&&n>=85)flush();else if(cur.length&&n+c>130&&n>=25)flush();cur.push([i,x]);n+=c});flush();
+  if(CARDS.length>1&&CARDS[CARDS.length-1].reduce((a,[,x])=>a+cnt(x),0)<45){const l=CARDS.pop();CARDS[CARDS.length-1].push(...l)}
+  CARDS.forEach((g,k)=>{CARDS[k]={id:'p'+(k+1),k:k+1,u:g[0][0],u2:g[g.length-1][0],text:g.map(x=>x[1]).join(''),n:g.reduce((a,[,x])=>a+cnt(x),0)}});
+})();
+const TOTAL_CH=CARDS.reduce((a,c)=>a+c.n,0);
+const INT=[5*60e3,30*60e3,12*36e5,864e5,2*864e5,4*864e5,7*864e5,15*864e5,30*864e5];
+function maskText(text,stage){
+  const keep=stage<=1?3:stage<=3?1:0;
+  return text.split(/(?<=[，。；：！？、])/).map(p=>{const m=p.match(/[，。；：！？、]$/);const pun=m?m[0]:'';const w=pun?p.slice(0,-1):p;return w.slice(0,keep)+'<i>'+'○'.repeat(Math.max(0,w.length-keep))+'</i>'+pun}).join('');
+}
+const dueList=()=>{const now=Date.now();return CARDS.filter(c=>cards[c.id]&&cards[c.id].due<=now)};
+const newToday=()=>newd[dstr()]||0;
+const nextNew=()=>CARDS.find(c=>!cards[c.id]);
+const cLabel=c=>`第 ${c.k} 段／共 ${CARDS.length} 段・約 ${c.n} 字`;
+function renderRec(){
+  $('#v-rec').classList.remove('fullmode');$('#rc-full').style.display='none';
+  $('#rc-home').style.display='';$('#rc-card').style.display='none';
+  const d=dueList().length,nn=nextNew(),canNew=nn&&newToday()<1,learned=CARDS.filter(c=>cards[c.id]).length;
+  $('#rcIntro').textContent=`每天背約 100 字：先念三遍，再憑記憶背出來，然後按「記得／模糊／忘了」，系統安排什麼時候再複習。整部經 ${TOTAL_CH.toLocaleString()} 字，分成 ${CARDS.length} 段，約 ${CARDS.length} 天背完。`;
+  $('#rcDue').textContent=d;$('#rcNew').textContent=newToday()+'/1';$('#rcKnown').textContent=learned+'/'+CARDS.length;
+  const st=$('#rcStart'),more=$('#rcMore');
+  if(d+(canNew?1:0)>0){st.disabled=false;st.textContent=`開始今天的背誦${canNew?`（新 1 段約 ${nn.n} 字`:'（'}${canNew&&d?'、':''}${d?`複習 ${d} 段`:''}）`.replace('（）','')}else{st.disabled=true;st.textContent=nn?'今天的份量完成了':'整部經都背過了'}
+  more.style.display=(!canNew&&nn)?'':'none';
+  $('#rcMap').innerHTML=CARDS.map(c=>{const o=cards[c.id];return `<i class="${o?(o.s>=5?'kn':'ln'):''}">${c.k}</i>`}).join('');
+  const nx=Object.values(cards).map(c=>c.due).filter(t=>t>Date.now()).sort((a,b)=>a-b)[0];
+  $('#rcNote').textContent=nx&&!d?'下一段要複習的時間：'+new Date(nx).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+'。':'金色＝背誦中，橘色＝已熟（連續記得 5 次）。';
+  $('#fullImg').src=imgSrc(9);const fu=store.get('fullU',0);$('#fullSub').textContent=fu?`上次停在第 ${fu+1} 段，點一下接著誦`:`15 段，一句一句誦完${recAll?'（已誦完 '+recAll+' 次）':''}`;
+  $('#fullGo').onclick=()=>startFull();
+}
+let queue=[],curCard=null,revealed=false,learnN=0;
+$('#rcStart').onclick=()=>{queue=[...dueList()];const nn=nextNew();if(nn&&newToday()<1)queue.push({...nn,learn:1});nextCard()};
+$('#rcMore').onclick=()=>{const nn=nextNew();if(!nn)return;queue=[{...nn,learn:1}];nextCard()};
+function nextCard(){
+  curCard=queue.shift();
+  if(!curCard){renderRec();return}
+  revealed=false;learnN=0;curCard.learn?drawLearn():drawCard();
+}
+function drawLearn(){
+  const c=curCard,el=$('#rc-card');$('#rc-home').style.display='none';el.style.display='';
+  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　新段・先念三遍</div><div class="tx">${c.text}</div></div><div class="lr">跟著念，念完一遍按一下（${learnN}／3）</div>
+   <button class="big" id="lr">${learnN>=3?'開始背':'念完一遍'}</button><button class="big alt" id="rcBack" style="margin-top:6px">先到這裡</button>`;
+  $('#lr').onclick=()=>{if(learnN>=3){curCard={...c,learn:0};drawCard()}else{learnN++;drawLearn()}};
+  $('#rcBack').onclick=renderRec;
+}
+function drawCard(){
+  const c=curCard,st=(cards[c.id]||{s:0}).s;
+  $('#rc-home').style.display='none';const el=$('#rc-card');el.style.display='';
+  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　${cards[c.id]?'複習':'新段'}</div><div class="tx" id="cx">${revealed?c.text:maskText(c.text,st)}</div></div>`+
+   (revealed?`<div class="rate"><button class="f" data-r="f">忘了</button><button class="m" data-r="m">模糊</button><button class="g" data-r="g">記得</button></div>`:`<button class="big" id="rv">看答案</button>`)+
+   `<button class="big alt" id="rcBack" style="margin-top:14px">先到這裡</button><p class="note">先試著念出來，再看答案。誠實按就好，沒有分數。</p>`;
+  if(!revealed)$('#rv').onclick=()=>{revealed=true;drawCard()};
+  document.querySelectorAll('.rate button').forEach(b=>b.onclick=()=>rate(b.dataset.r));
+  $('#rcBack').onclick=renderRec;
+}
+function rate(r){
+  const c=curCard;let o=cards[c.id];if(!o){o={s:0,due:0};newd[dstr()]=newToday()+1}
+  if(r==='g')o.s=Math.min(8,o.s+1);else if(r==='f')o.s=0;
+  o.due=Date.now()+INT[r==='m'?Math.max(0,o.s-1):o.s];cards[c.id]=o;saveRec();nextCard();
+}
+/* ---------- 整部經典（逐段、逐句；原地更新不重繪） ---------- */
+const LOTUS_SVG='<svg viewBox="0 0 40 40"><g transform="translate(20 22)"><path d="M0 -14C-5 -8 -6 -2 0 6C6 -2 5 -8 0 -14Z" fill="#f4bfb5" stroke="#c9705a" stroke-width="1"/><path d="M-4 4C-14 2 -16 -6 -13 -10C-8 -8 -5 -3 -4 4Z" fill="#f7d6cc" stroke="#c9705a" stroke-width="1"/><path d="M4 4C14 2 16 -6 13 -10C8 -8 5 -3 4 4Z" fill="#f7d6cc" stroke="#c9705a" stroke-width="1"/></g></svg>';
+function startFull(from){
+  let ui=from??store.get('fullU',0),k=0,ph=[],sp=[];
+  const el=$('#rc-full');$('#v-rec').classList.add('fullmode');$('#rc-home').style.display='none';$('#rc-card').style.display='none';el.style.display='';
+  const phr=i=>UNITS[i].sutra.replace(/\s+/g,'').replace('車𤦲','硨磲').split(/(?<=[，。；：！？、])/).filter(Boolean);
+  const paint=first=>{
+    document.querySelectorAll('#flp i').forEach((d,i)=>{d.className=i<ui?'on':i===ui?'cu':''});
+    sp.forEach((x,j)=>{x.className=(j<k?'on':'')+(j===k?' cur':'')});
+    const last=ui===UNITS.length-1,fin=k>=ph.length;
+    $('#flNext').textContent=fin?(last?'全經誦完 ✓':'下一段 ›'):'念下一句';
+    const fb=$('#flb'),cur=sp[Math.min(k,sp.length-1)];
+    if(fb&&cur){const top=cur.getBoundingClientRect().top-fb.getBoundingClientRect().top+fb.scrollTop-fb.clientHeight/2+cur.offsetHeight/2;fb.scrollTo({top:Math.max(0,top),behavior:first?'auto':'smooth'})}
+  };
+  const build=()=>{
+    ph=phr(ui);k=0;store.set('fullU',ui);const u=UNITS[ui];
+    el.innerHTML=`<div class="fl-prog" id="flp">${UNITS.map((_,i)=>`<i data-i="${i}"></i>`).join('')}</div>
+      <div class="fl-art"><img src="${imgSrc(ui)}" alt=""></div>
+      <div class="fl-t">${ui+1}．${u.title}</div>
+      <div class="fl-orn"><i></i>${LOTUS_SVG}<i></i></div>
+      <div class="fl-body" id="flb"><div class="follow">${ph.map(x=>`<span>${x}</span>`).join('')}</div></div>
+      <div class="fl-bar"><button class="big alt" id="flBack">${ui?'‹ 上一段':'返回'}</button><button class="big" id="flNext"></button></div>`;
+    sp=[...el.querySelectorAll('.follow span')];
+    el.querySelectorAll('#flp i').forEach(d=>d.onclick=()=>{ui=+d.dataset.i;build()});
+    $('#flBack').onclick=()=>{if(ui){ui--;build()}else renderRec()};
+    $('#flNext').onclick=step;paint(true);
+  };
+  const step=()=>{
+    if(k<ph.length){k++;paint();return}
+    const last=ui===UNITS.length-1;
+    recU[ui]=(recU[ui]||0)+1;recd[dstr()]=(recd[dstr()]||0)+1;
+    if(last){recAll++;store.set('recAll',recAll);store.set('fullU',0)}
+    saveRec();
+    if(last){el.innerHTML=`<div class="fl-art" style="margin-top:20px"><img src="${imgSrc(14)}" alt=""></div><div class="fl-t" style="font-size:24px;margin-top:14px">整部經典，誦完了</div><div class="fl-orn"><i></i>${LOTUS_SVG}<i></i></div><p class="note" style="text-align:center;font-size:14px;line-height:2">願以此功德，迴向給需要的人。<br>到「迴向」做一張祝福卡吧。</p><div class="fl-bar"><button class="big alt" id="flHome">返回</button><button class="big" id="flBl">做祝福卡</button></div>`;$('#flHome').onclick=renderRec;$('#flBl').onclick=()=>goTab('bless');return}
+    ui++;build();
+  };
+  build();
+}
+
+/* ---------- 修行記錄 ---------- */
+let mY=new Date().getFullYear(),mM=new Date().getMonth(),selDay=null;
+const lotus=n=>{const t=n>=1080?3:n>=324?2:n>=108?1:0;const sc=[.55,.7,.85,1][t],f=['#f7d6cc','#f4bfb5','#eea6a0','#e98f98'][t];
+  return `<svg viewBox="0 0 40 40"><g transform="translate(20 22) scale(${sc})"><path d="M0 -14C-5 -8 -6 -2 0 6C6 -2 5 -8 0 -14Z" fill="${f}" stroke="#c9705a" stroke-width=".8"/><path d="M-4 4C-14 2 -16 -6 -13 -10C-8 -8 -5 -3 -4 4Z" fill="${f}" stroke="#c9705a" stroke-width=".8"/><path d="M4 4C14 2 16 -6 13 -10C8 -8 5 -3 4 4Z" fill="${f}" stroke="#c9705a" stroke-width=".8"/><path d="M-3 7C-12 12 -6 15 0 11C6 15 12 12 3 7Z" fill="#d6e5c8" stroke="#8aa77a" stroke-width=".8"/></g>${t==3?'<circle cx="20" cy="9" r="2" fill="#f0c96a"/>':''}</svg>`};
+function streak(){let n=0;const d=new Date();if(!(hist[dstr(d)]||recd[dstr(d)]))d.setDate(d.getDate()-1);while((hist[dstr(d)]||0)>0||(recd[dstr(d)]||0)>0){n++;d.setDate(d.getDate()-1)}return n}
+function renderDays(){
+  const td=dstr(),now=new Date();let wk=0;for(let i=0;i<7;i++){const d=new Date(now);d.setDate(now.getDate()-i);wk+=hist[dstr(d)]||0}
+  $('#dToday').textContent=(hist[td]||0).toLocaleString();$('#dWeek').textContent=wk.toLocaleString();$('#dTotal').textContent=S.total.toLocaleString();
+  const st=streak();$('#streakNote').textContent=st?`已連續 ${st} 天有念佛或誦經。中斷了也沒關係，隨時再從今天開始。`:'今天還沒開始。想念的時候再念，不急。';
+  $('#mTitle').textContent=`${mY} 年 ${mM+1} 月`;
+  const first=new Date(mY,mM,1).getDay(),days=new Date(mY,mM+1,0).getDate();let h='';'日一二三四五六'.split('').forEach(w=>h+=`<div class="wd">${w}</div>`);
+  for(let i=0;i<first;i++)h+='<div></div>';
+  for(let d=1;d<=days;d++){const k=mY+'-'+String(mM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),n=hist[k]||0,r=recd[k]||0;
+    h+=`<div class="c${k===td?' now':''}${k===selDay?' sel':''}" data-k="${k}"><em>${d}</em>${n?lotus(n):''}${r?'<i></i>':''}</div>`}
+  $('#cal').innerHTML=h;
+  document.querySelectorAll('#cal .c[data-k]').forEach(c=>c.onclick=()=>{selDay=c.dataset.k;const n=hist[selDay]||0,r=recd[selDay]||0;$('#dayDetail').textContent=`${selDay.slice(5).replace('-','/')}：念佛 ${n.toLocaleString()} 聲${r?`，誦完 ${r} 段`:''}`;renderDays()});
+  if(selDay){const n=hist[selDay]||0,r=recd[selDay]||0;$('#dayDetail').textContent=`${selDay.slice(5).replace('-','/')}：念佛 ${n.toLocaleString()} 聲${r?`，誦完 ${r} 段`:''}`}else $('#dayDetail').textContent='點日期看當天；蓮花越大代表念得越多，金點代表有誦經。';
+  const mx=Math.max(108,...Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-6+i);return hist[dstr(d)]||0}));
+  $('#bars').innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-6+i);const n=hist[dstr(d)]||0;return `<div><i style="height:${Math.round(n/mx*100)}%"></i>${d.getMonth()+1}/${d.getDate()}</div>`}).join('');
+  const done=Object.keys(recU).filter(k=>recU[k]).length,known=CARDS.filter(c=>cards[c.id]&&cards[c.id].s>=5).length;
+  const M=[['第一圈',S.total>=108,'累計念滿 108 聲'],['一千零八十',S.total>=1080,'累計 1,080 聲'],['一萬',S.total>=10000,'累計 10,000 聲'],['連續七日',st>=7,'連續 7 天有修'],['跟誦過半',done>=8,`跟誦 ${done}／15 段`],['全經誦完',recAll>=1,recAll?`已誦完整部 ${recAll} 次`:'整部誦完一次'],['背誦熟練',known>=CARDS.length,`熟練 ${known}／${CARDS.length} 段`]];
+  $('#ms').innerHTML=M.map(([a,ok,b])=>`<div class="${ok?'ok':''}"><b>${ok?'✓ ':''}${a}</b>${b}</div>`).join('');
+  const g=$('#dayGrid');g.innerHTML='';
+  if(!plan){$('#dayNote').textContent='還沒設定。';return}
+  $('#dayN').value=plan.n;const s0=new Date(plan.start+'T00:00:00');let sum=0;
+  for(let i=0;i<plan.n;i++){const d=new Date(s0);d.setDate(s0.getDate()+i);const k=dstr(d),n=hist[k]||0;sum+=n;const e=document.createElement('div');e.className='day'+(n?' has':'')+(k===td?' now':'');e.innerHTML=`<span>第${i+1}天</span><b>${n||'·'}</b>`;g.appendChild(e)}
+  $('#dayNote').textContent=`這 ${plan.n} 天一共 ${sum.toLocaleString()} 聲。`;
+}
+$('#mPrev').onclick=()=>{mM--;if(mM<0){mM=11;mY--}renderDays()};$('#mNext').onclick=()=>{mM++;if(mM>11){mM=0;mY++}renderDays()};
+$('#dayGo').onclick=()=>{const n=Math.max(1,Math.min(49,parseInt($('#dayN').value)||7));plan={start:dstr(),n};store.set('plan',plan);renderDays()};
+
+/* ---------- 迴向與祝福卡（所見即所得：上面預覽，下面選） ---------- */
+const TO=['自己','家人','朋友','老師','亡者','所有眾生'];
+const LINES=['無有眾苦，但受諸樂','得與如是諸上善人俱會一處','心不顛倒，即得往生','不可以少善根福德因緣得生彼國'];
+const LINE_BG=[2,7,9,8];
+const LAYOUTS=['滿版畫面','上圖下文'];
+let sel={to:'家人',name:'',line:LINES[0],custom:'',bg:2,ly:0,tab:'bg'};
+const rk=i=>'u'+String(i+1).padStart(2,'0');
+const imgSrc=i=>(window.READ_IMG||{})[rk(i)]||`assets/read/${rk(i)}.jpg`;
+const IMGC={};function getImg(i){if(!IMGC[i]){const m=new Image();m.onload=()=>updPrev();m.src=imgSrc(i);IMGC[i]=m}return IMGC[i]}
+function wrapText(g,t,maxW){const out=[];let cur='';for(const ch of t){if(g.measureText(cur+ch).width>maxW&&cur){out.push(cur);cur=ch}else cur+=ch}if(cur)out.push(cur);return out}
+function rr(g,x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r)}
+function renderCard(){
+  const w=720,h=1000,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+  const im=getImg(sel.bg);g.fillStyle='#fdf1e5';g.fillRect(0,0,w,h);
+  const SERIF='"Noto Serif TC","Songti TC","PMingLiU",serif';let py,ph;
+  if(sel.ly===0){
+    if(im.complete&&im.naturalWidth){const sc=h/im.naturalHeight,dw=im.naturalWidth*sc;g.drawImage(im,(w-dw)/2,0,dw,h)}
+    py=300;ph=640;g.fillStyle='rgba(255,250,244,.74)';rr(g,60,py,w-120,ph,30);g.fill();
+  }else{
+    const ah=im.naturalWidth?w*im.naturalHeight/im.naturalWidth:540;
+    if(im.complete&&im.naturalWidth){g.drawImage(im,0,0,w,ah);const fd=g.createLinearGradient(0,ah*.7,0,ah);fd.addColorStop(0,'rgba(253,241,229,0)');fd.addColorStop(1,'#fdf1e5');g.fillStyle=fd;g.fillRect(0,ah*.7,w,ah*.31)}
+    py=ah-60;ph=h-py-50;g.fillStyle='rgba(255,252,247,.85)';rr(g,60,py,w-120,ph,30);g.fill();
+  }
+  g.strokeStyle='rgba(205,165,100,.85)';g.lineWidth=2.5;rr(g,60,py,w-120,ph,30);g.stroke();
+  g.strokeStyle='rgba(205,165,100,.4)';g.lineWidth=1.2;rr(g,74,py+14,w-148,ph-28,22);g.stroke();
+  const cy=py+ph/2;g.textAlign='center';g.textBaseline='middle';
+  g.fillStyle='#a98b78';g.font='30px '+SERIF;g.fillText('給 '+(sel.name.trim()||sel.to),w/2,py+78);
+  g.strokeStyle='rgba(217,168,74,.9)';g.lineWidth=2;g.beginPath();g.moveTo(w/2-70,py+118);g.lineTo(w/2-14,py+118);g.moveTo(w/2+14,py+118);g.lineTo(w/2+70,py+118);g.stroke();
+  g.fillStyle='rgba(233,143,152,.9)';g.beginPath();g.ellipse(w/2,py+118,6,10,0,0,7);g.fill();
+  const line=sel.custom.trim()||sel.line;g.fillStyle='#6d4331';g.font='400 54px '+SERIF;
+  const rows=line.split(/(?<=，)/).flatMap(x=>wrapText(g,x,w-250)),lh=90,y0=cy-(rows.length-1)*lh/2+10;
+  rows.forEach((t,i)=>g.fillText(t,w/2,y0+i*lh));
+  g.fillStyle='#b07b60';g.font='28px '+SERIF;g.fillText(S.name,w/2,py+ph-92);
+  const dd=new Date();g.fillStyle='#a98b78';g.font='19px '+SERIF;g.fillText((sel.custom.trim()?'自己的祝福':'《佛說阿彌陀經》')+'　'+dd.getFullYear()+'.'+(dd.getMonth()+1)+'.'+dd.getDate(),w/2,py+ph-48);
+  return c;
+}
+function updPrev(){const p=$('#blCv');if(!p)return;const g=p.getContext('2d');g.clearRect(0,0,720,1000);g.drawImage(renderCard(),0,0)}
+function chipRow(arr,key,onpick){return arr.map((x,i)=>`<button class="chip${sel[key]===(typeof x==='string'&&key!=='ly'?x:i)?' on':''}" data-i="${i}">${x}</button>`).join('')}
+function renderPanel(){
+  const P=$('#blPanel'),t=sel.tab;
+  document.querySelectorAll('#blTabs button').forEach(b=>b.classList.toggle('on',b.dataset.p===t));
+  if(t==='bg'){
+    P.innerHTML='<div class="note">挑一張經文裡的畫面（左右滑）</div><div class="thumbs" id="bgThumbs"></div>';
+    const c=$('#bgThumbs');UNITS.forEach((u,i)=>{const b=document.createElement('button');b.className='th'+(sel.bg===i?' on':'');b.innerHTML=`<img src="${imgSrc(i)}" alt=""><span>${i+1}．${u.title.split('：')[0].slice(0,5)}</span>`;b.onclick=()=>{sel.bg=i;c.querySelectorAll('.th').forEach((x,j)=>x.classList.toggle('on',j===i));updPrev()};c.appendChild(b)});
+    const on=c.querySelector('.on');if(on)c.scrollLeft=Math.max(0,on.offsetLeft-80);
+  }else if(t==='line'){
+    P.innerHTML=`<div class="note">選一句經文，或寫自己的話</div><div class="chips" id="lnC">${LINES.map((x,i)=>`<button class="chip${!sel.custom&&sel.line===x?' on':''}" data-i="${i}">${x}</button>`).join('')}</div><textarea id="lnT" rows="2" placeholder="或寫自己的話（選填，會取代上面）" maxlength="40">${sel.custom}</textarea>`;
+    P.querySelectorAll('#lnC .chip').forEach(b=>b.onclick=()=>{sel.line=LINES[+b.dataset.i];sel.custom='';sel.bg=LINE_BG[+b.dataset.i];renderPanel();updPrev()});
+    $('#lnT').oninput=e=>{sel.custom=e.target.value;P.querySelectorAll('#lnC .chip').forEach(x=>x.classList.remove('on'));updPrev()};
+  }else if(t==='to'){
+    P.innerHTML=`<div class="note">這張卡要給誰</div><div class="chips" id="toC">${TO.map(x=>`<button class="chip${!sel.name&&sel.to===x?' on':''}" data-i="${x}">${x}</button>`).join('')}</div><input type="text" id="toN" placeholder="也可以寫名字（選填）" maxlength="10" value="${sel.name}">`;
+    P.querySelectorAll('#toC .chip').forEach(b=>b.onclick=()=>{sel.to=b.dataset.i;sel.name='';renderPanel();updPrev()});
+    $('#toN').oninput=e=>{sel.name=e.target.value;P.querySelectorAll('#toC .chip').forEach(x=>x.classList.remove('on'));updPrev()};
+  }else{
+    P.innerHTML=`<div class="note">版型</div><div class="chips" id="lyC">${LAYOUTS.map((x,i)=>`<button class="chip${sel.ly===i?' on':''}" data-i="${i}">${x}</button>`).join('')}</div><p class="note">滿版畫面：整張畫面當背景；上圖下文：畫面在上、文字在下。</p>`;
+    P.querySelectorAll('#lyC .chip').forEach(b=>b.onclick=()=>{sel.ly=+b.dataset.i;renderPanel();updPrev()});
+  }
+}
+document.querySelectorAll('#blTabs button').forEach(b=>b.onclick=()=>{sel.tab=b.dataset.p;renderPanel()});
+function renderBless(){renderPanel();updPrev()}
+$('#blSave').onclick=()=>{
+  renderCard().toBlob(async b=>{
+    const f=new File([b],'祝福卡.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'祝福卡'});return}catch(e){if(e&&e.name==='AbortError')return}}
+    const url=URL.createObjectURL(b);$('#mdlImg').src=url;$('#mdlDl').href=url;$('#mdl').classList.add('on');
+  },'image/png');
+};
+$('#mdlX').onclick=()=>$('#mdl').classList.remove('on');
+renderBless();
+
+markPick();
+function renderHome(){
+  $('#hmImg').src=imgSrc(0);
+  $('#hmNextT').textContent=`第 ${rdI+1} 段　${UNITS[rdI].title.split('：')[0]}`;
+  $('#hmSt').textContent=`累計念佛 ${S.total.toLocaleString()} 聲${streak()?'　連續 '+streak()+' 天':''}　›`;
+}
+$('#cnTitle').textContent=S.name;
+$('#v-count').style.setProperty('--pond',`url(${imgSrc(9)})`);
+if(!S.bead)S.bead='dark';
+renderHome();show('app');startCount();
+</script>
+</body>
+</html>
