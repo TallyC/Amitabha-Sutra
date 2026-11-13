@@ -228,7 +228,11 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .hp .sign{text-align:center;font-size:calc(14.5px*var(--ui,1));color:var(--soft);letter-spacing:.15em;margin:14px 0 4px}
 .rcends{display:flex;justify-content:space-between;font-size:calc(12.5px*var(--ui,1));color:var(--soft);letter-spacing:.08em}
 #rcStart,#rcMore{white-space:nowrap}
-.verBar{display:block;width:calc(100% - 28px);margin:8px 14px 0;padding:6px 12px;border-radius:999px;border:1px solid rgba(160,120,80,.3);background:rgba(255,250,240,.8);font-size:12.5px;color:#6b5646;text-align:left;flex:none}.pad>.verBar{width:100%;margin:0 0 8px}#grpSeg button{white-space:nowrap;padding:8px 6px;font-size:13px;min-width:0}#grpSeg{flex:1}#grpSeg button:first-child{flex:1.9}.verBar b{color:#5a4030}
+.verBar{display:block;width:calc(100% - 28px);margin:8px 14px 0;padding:6px 12px;border-radius:999px;border:1px solid rgba(160,120,80,.3);background:rgba(255,250,240,.8);font-size:12.5px;color:#6b5646;text-align:left;flex:none}.pad>.verBar{width:100%;margin:0 0 8px}#grpSeg button{white-space:nowrap;padding:8px 6px;font-size:13px;min-width:0}#grpSeg{flex:1}#grpSeg button:first-child{flex:1.9}#frame.imm .tabs,#frame.imm .disc{display:none}
+#v-count.imm .top,#v-count.imm .cnact,#v-count.imm .bottom{display:none}
+#immX{display:none;position:absolute;top:10px;right:12px;z-index:5;opacity:.65;padding:7px 14px;font-size:13px;-webkit-user-select:none;user-select:none;touch-action:none}
+#v-count.imm #immX{display:block}#immX.hold{opacity:1;background:#e9c9bb}
+.verBar b{color:#5a4030}
 .rdVer{margin:6px 0 8px;padding:8px 11px;border-radius:12px;background:rgba(255,250,240,.75);border:1px solid rgba(160,120,80,.25);font-size:12.5px;line-height:1.7;color:#6b5646}.rdVer b{color:#5a4030}.rdVer ul{margin:3px 0 0;padding-left:18px}
 .wl{position:absolute;inset:0;z-index:70;background:rgba(80,55,40,.5);display:none;align-items:center;justify-content:center;padding:16px}
 .wl.on{display:flex}
@@ -284,7 +288,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .cnact .pill.hi{border-color:var(--accent);color:#fff;background:linear-gradient(135deg,#d58a6f,#c9705a);animation:cnIn .5s ease both}
 @keyframes cnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 #cv{transition:transform .7s cubic-bezier(.25,.8,.25,1),filter .7s ease;transform-origin:50% 36%}
-#stage.lift #cv{transform:scale(1.1);filter:drop-shadow(0 10px 14px rgba(120,70,40,.25))}
+#stage.lift #cv{transform:scale(1.05);filter:drop-shadow(0 10px 14px rgba(120,70,40,.25))}
 
 .dpsel{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:calc(16px*var(--ui,1));background:var(--glass);color:var(--ink);margin-top:6px}
 .dpcard{background:rgba(255,250,244,.92);border:1px solid #e6d3bd;border-radius:14px;padding:10px 14px;margin:8px 0;font-size:calc(15.5px*var(--ui,1));line-height:1.8}
@@ -450,6 +454,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 
   <div id="v-count" class="view">
     <div class="top"><button class="pill" id="back">換珠／設定</button><span class="ttl" id="cnTitle"></span><button class="pill" id="toDays">記錄</button></div>
+    <button class="pill" id="immX">按住結束</button>
     <div id="stage"><canvas id="cv"></canvas>
       <div id="info"><div class="n" id="n">0</div><div class="name" id="nm"></div><div class="of"><span id="of"></span>　<span id="third"></span></div></div></div>
     <div class="stats"><span>今日<b id="sToday">0</b></span><span>累計<b id="sTotal">0</b></span><span id="sRoundW">組數<b id="sRound">0</b></span></div>
@@ -793,7 +798,7 @@ function add(){
 function undo(){if(S.total<=0||todayN()<=0)return;S.total--;hist[dstr()]=todayN()-1;save();render();kick()}
 function startCount(){MIR=S.hand==='R';NB=RING[S.grp]||36;pos=rel();vel=0;render();setTimeout(resize,0)}
 let liftT=0;
-$('#v-count').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();$('#stage').classList.add('lift');clearTimeout(liftT);liftT=setTimeout(()=>$('#stage').classList.remove('lift'),3500);add()});
+$('#v-count').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();$('#stage').classList.add('lift');immOn();clearTimeout(liftT);liftT=setTimeout(()=>$('#stage').classList.remove('lift'),3500);add()});
 $('#undo').onclick=undo;
 function syncHand(){document.querySelectorAll('#handQuick button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.hand))}
 document.querySelectorAll('#handQuick button').forEach(b=>b.onclick=()=>{S.hand=b.dataset.v;store.set('hand',S.hand);MIR=S.hand==='R';syncHand();resize()});
@@ -804,6 +809,7 @@ $('#wake').onclick=async()=>{const b=$('#wake');try{if(wl){await wl.release();wl
 window.addEventListener('resize',resize);
 
 function goTab(t){
+  if(t!=='count'&&typeof immOff==='function')immOff();
   if(typeof ttsStop==='function')ttsStop();
   if(t==='deep'&&typeof renderDeep==='function')renderDeep();
   if(t==='focus')renderFocus();
@@ -1226,6 +1232,15 @@ $('#wlX').onclick=closeWl;
 $('#wlNo').onclick=()=>{store.set('noRemind',1);closeWl()};
 $('#wlHelp').onclick=()=>{closeWl();goTab('help');$('#hpInstall').open=true;setTimeout(()=>$('#hpInstall').scrollIntoView({block:'start'}),50)};
 showWelcome();
+
+/* ===== 念佛專心畫面：開始撥珠後，隱藏其他按鈕 ===== */
+function immOn(){if($('#v-count').classList.contains('imm'))return;$('#v-count').classList.add('imm');$('#frame').classList.add('imm');setTimeout(resize,30);setTimeout(resize,400)}
+function immOff(){if(!$('#v-count').classList.contains('imm'))return;$('#v-count').classList.remove('imm');$('#frame').classList.remove('imm');$('#stage').classList.remove('lift');setTimeout(resize,30);setTimeout(resize,400)}
+(function(){const b=$('#immX');let t=0;
+  const st=e=>{e.preventDefault();e.stopPropagation();b.classList.add('hold');t=setTimeout(()=>{b.classList.remove('hold');immOff()},700)};
+  const en=()=>{clearTimeout(t);b.classList.remove('hold')};
+  b.addEventListener('pointerdown',st);['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,en));
+})();
 
 /* ===== 經文版本說明 ===== */
 const VARS=[["目乾連","目犍連"],["迦栴延","迦旃延"],["拘絺羅","俱絺羅"],["周梨槃陀迦","周利槃陀伽"],["薄俱羅","薄拘羅"],["白鵠","白鶴"],["頗梨","玻璃"],["車𤦲","硨磲"],["皆自然生念佛","自然皆生念佛"]];
