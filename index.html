@@ -230,8 +230,8 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 #rcStart,#rcMore{white-space:nowrap}
 .verBar{display:block;width:calc(100% - 28px);margin:8px 14px 0;padding:6px 12px;border-radius:999px;border:1px solid rgba(160,120,80,.3);background:rgba(255,250,240,.8);font-size:12.5px;color:#6b5646;text-align:left;flex:none}.pad>.verBar{width:100%;margin:0 0 8px}#grpSeg button{white-space:nowrap;padding:8px 6px;font-size:13px;min-width:0}#grpSeg{flex:1}#grpSeg button:first-child{flex:1.9}#frame.imm .tabs,#frame.imm .disc{display:none}
 #v-count.imm .top,#v-count.imm .cnact,#v-count.imm .bottom{display:none}
-#immX{display:none;position:absolute;top:10px;right:12px;z-index:5;opacity:.65;padding:7px 14px;font-size:13px;-webkit-user-select:none;user-select:none;touch-action:none}
-#v-count.imm #immX{display:block}#immX.hold{opacity:1;background:#e9c9bb}
+#immX{display:none;position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:5;opacity:.9;padding:9px 16px;font-size:15px;-webkit-user-select:none;user-select:none}
+#v-count.imm #immX{display:block}
 #handSeg{flex:none;width:100%;border:0;background:none;gap:12px;margin-top:8px;overflow:visible}
 #handSeg button{border:1.5px solid var(--line);border-radius:16px;background:var(--glass);padding:6px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:calc(16px*var(--ui,1))}
 #handSeg button.on{background:#f7dcd0;border-color:var(--accent);color:#8a3f2a;font-weight:600}
@@ -350,7 +350,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
       <li><b>選段落</b>：用下拉選單（顯示每段開頭幾個字）或在進度條上點選、滑動，選好按「背這段」。</li>
       <li><b>語音報讀</b>：按「報讀」聽手機唸這一段；可選慢／中／常速。念得不對可到「唸法」修改。</li>
       <li><b>整部經典</b>：一句一句誦完全經，按「念下一句」往下；上方下拉可跳到任一段。</li></ul>
-      <p><b>念佛</b>：先選一串佛珠（選好才開始），點畫面任何地方撥一顆。每組幾顆可自己選（不分組、18、21、27、36），珠環會跟著變；可換左右手、換聖號、復原上一聲、螢幕常亮。沒有任何音效。</p>
+      <p><b>念佛</b>：先選一串佛珠（選好才開始），點畫面任何地方撥一顆。每組幾顆可自己選（不分組、18、21、27、36），珠環會跟著變；可換左右手、換聖號、復原上一聲、螢幕常亮。沒有任何音效。撥第一顆珠後進入專心畫面，其他按鈕會隱藏避免誤觸；要離開請按右上角「結束念佛」，再確認一次。</p>
       <p><b>迴向</b>：做一張祝福卡，長按圖片或按下載即可儲存。</p>
       <p><b>記錄</b>：念佛與誦經的日曆，蓮花越大代表念得越多。中斷了也沒關係，不比較、不催促。</p>
     </details>
@@ -460,7 +460,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 
   <div id="v-count" class="view">
     <div class="top"><button class="pill" id="back">換珠／設定</button><span class="ttl" id="cnTitle"></span><button class="pill" id="toDays">記錄</button></div>
-    <button class="pill" id="immX">按住結束</button>
+    <button class="pill" id="immX">結束念佛 ✕</button>
     <div id="stage"><canvas id="cv"></canvas>
       <div id="info"><div class="n" id="n">0</div><div class="name" id="nm"></div><div class="of"><span id="of"></span>　<span id="third"></span></div></div></div>
     <div class="stats"><span>今日<b id="sToday">0</b></span><span>累計<b id="sTotal">0</b></span><span id="sRoundW">組數<b id="sRound">0</b></span></div>
@@ -558,6 +558,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <ul style="margin:6px 0 10px;padding-left:20px;line-height:1.9;font-size:15px">
       <li><b>撥珠</b>：點畫面任何地方，撥一顆；按住時佛珠會放大。</li>
       <li><b>每組幾顆</b>：在「換珠／設定」選，珠環會跟著變；也可以選「不分組」，只累計。</li>
+      <li><b>專心畫面</b>：撥第一顆珠後，其他按鈕會隱藏，避免誤觸。要離開，按右上角「結束念佛」，再按一次確認。</li>
       <li><b>念錯了</b>：按左下「復原」。左手、右手可在下方切換。</li>
       <li><b>常亮</b>：按右下「常亮」，念佛時螢幕不熄。</li>
       <li><b>迴向</b>：念了之後（一句也可以）會出現「迴向」鈕，不念不出現。</li>
@@ -571,6 +572,12 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <h2>經文版本與用字</h2>
     <div id="verBody" style="font-size:14.5px;line-height:1.8;color:#5a4030"></div>
     <button class="big" id="verX" style="margin-top:10px">關閉</button>
+  </div></div>
+  <div class="wl" id="immM"><div class="cd">
+    <h2>要結束念佛嗎？</h2>
+    <p style="text-align:center;margin:4px 0 12px;font-size:15px;color:#6b5646">今日已念 <b id="immN">0</b> 聲，結束後可以迴向。</p>
+    <button class="big" id="immKeep">繼續念佛</button>
+    <button class="big alt" id="immEnd">結束，回到選單</button>
   </div></div>
   <div class="tpanel" id="tp"></div><div class="toast" id="toast"></div>
   <div class="disc">AI 協助撰寫，請自行判斷；不主張著作權，歡迎廣傳。</div>
@@ -1243,11 +1250,10 @@ showWelcome();
 /* ===== 念佛專心畫面：開始撥珠後，隱藏其他按鈕 ===== */
 function immOn(){if($('#v-count').classList.contains('imm'))return;$('#v-count').classList.add('imm');$('#frame').classList.add('imm');setTimeout(resize,30);setTimeout(resize,400)}
 function immOff(){if(!$('#v-count').classList.contains('imm'))return;$('#v-count').classList.remove('imm');$('#frame').classList.remove('imm');$('#stage').classList.remove('lift');setTimeout(resize,30);setTimeout(resize,400)}
-(function(){const b=$('#immX');let t=0;
-  const st=e=>{e.preventDefault();e.stopPropagation();b.classList.add('hold');t=setTimeout(()=>{b.classList.remove('hold');immOff()},700)};
-  const en=()=>{clearTimeout(t);b.classList.remove('hold')};
-  b.addEventListener('pointerdown',st);['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,en));
-})();
+$('#immX').onclick=()=>{$('#immN').textContent=todayN();$('#immM').classList.add('on')};
+$('#immKeep').onclick=()=>$('#immM').classList.remove('on');
+$('#immEnd').onclick=()=>{$('#immM').classList.remove('on');immOff()};
+
 
 /* ===== 經文版本說明 ===== */
 const VARS=[["目乾連","目犍連"],["迦栴延","迦旃延"],["拘絺羅","俱絺羅"],["周梨槃陀迦","周利槃陀伽"],["薄俱羅","薄拘羅"],["白鵠","白鶴"],["頗梨","玻璃"],["車𤦲","硨磲"],["皆自然生念佛","自然皆生念佛"]];
