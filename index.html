@@ -283,6 +283,15 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 @keyframes cnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 #cv{transition:transform .16s cubic-bezier(.3,1.4,.5,1)}
 #stage.lift #cv{transform:scale(1.14) translateY(-6px);filter:drop-shadow(0 10px 14px rgba(120,70,40,.28))}
+
+.dpsel{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:calc(16px*var(--ui,1));background:var(--glass);color:var(--ink);margin-top:6px}
+.dpcard{background:rgba(255,250,244,.92);border:1px solid #e6d3bd;border-radius:14px;padding:10px 14px;margin:8px 0;font-size:calc(15.5px*var(--ui,1));line-height:1.8}
+.dpcard b{display:block;font-weight:500;color:var(--accent);letter-spacing:.1em}
+.dpcard span{color:var(--soft)}
+.dppend{padding:4px 2px}
+.dpbib b{display:block;margin-top:10px;font-weight:500;color:var(--accent)}
+.dpbib p{margin:4px 0;font-size:calc(15px*var(--ui,1));line-height:1.7;color:var(--ink)}
+.rdDeep{margin:2px 0 8px}
 </style>
 </head>
 <body>
@@ -300,13 +309,13 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 <div id="app">
   <div id="v-home" class="view home on">
     <img class="hero" id="hmImg" alt=""><div class="fade"></div>
-    <div class="hd"><h1>阿彌陀經</h1><p>讀　誦　念　迴向</p></div>
+    <div class="hd"><h1>阿彌陀經</h1><p>讀　誦　念　深入</p></div>
     <div class="body">
       <div class="hgrid">
         <button data-go="read"><b>讀經</b><span>15 段水彩繪本</span></button>
         <button data-go="rec"><b>誦經</b><span>背誦小卡</span></button>
         <button data-go="count"><b>念佛</b><span>佛珠計數</span></button>
-        <button data-go="bless"><b>迴向</b><span>祝福卡</span></button>
+        <button data-go="deep"><b>深入</b><span>古德怎麼說</span></button>
       </div>
       <button class="hnext" id="hmNext"><span>接著讀</span><small id="hmNextT"></small></button>
       <button class="hst" id="hmSt"></button>
@@ -403,20 +412,52 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     </div>
   </div>
 
+  <div id="v-deep" class="view pad hp">
+    <h2>深入</h2>
+    <p class="lead">想多了解這部經，從這裡看。每一區核對完才會開放，還沒核完的先標「準備中」。</p>
+    <div class="setbox"><b>選一段</b><select id="dpSel" class="dpsel"></select></div>
+    <details class="plan" open id="dpD1"><summary>① 這一段，大家怎麼說</summary>
+      <div class="dpcards" id="dpCards"></div></details>
+    <details class="plan"><summary>② 兩個譯本並排</summary><p class="note dppend">準備中：羅什本與玄奘《稱讚淨土佛攝受經》同段對看，逐字核對後開放。</p></details>
+    <details class="plan"><summary>③ 信願行小記錄</summary><p class="note dppend">準備中：只自我記錄，不計分、不比較。</p></details>
+    <details class="plan" hidden><summary>④ 一心不亂是什麼</summary><p class="note dppend">準備中：整理蓮池大師「事一心、理一心」的白話說明。</p></details>
+    <details class="plan" hidden><summary>⑤ 六方諸佛地圖</summary><p class="note dppend">準備中：可點的互動圖。</p></details>
+    <details class="plan" hidden><summary>⑥ 梵漢小對照</summary><p class="note dppend">準備中：只放對過梵本的少數名詞。</p></details>
+    <details class="plan" hidden><summary>⑦ 想再深入可以看</summary>
+      <p class="note">以下是目前查到的書目，只看過書目或摘要，還沒讀過全文；請當作找書的線索，不是結論。</p>
+      <div class="dpbib">
+        <b>古德註疏</b>
+        <p>蕅益智旭《阿彌陀經要解》（收在《淨土十要》）</p>
+        <p>圓瑛《阿彌陀經要解講義》</p>
+        <p>袾宏（蓮池）《阿彌陀經疏鈔》</p>
+        <p>窺基《阿彌陀經通贊疏》；元照《阿彌陀經義疏》</p>
+        <p>聖嚴法師《聖嚴法師教淨土法門》第四篇《阿彌陀經》講記（法鼓全集 05-10）</p>
+        <b>現代研究</b>
+        <p>高婉瑜〈論《阿彌陀經》漢文異譯本的詞彙與篇章風格〉，《淡江中文學報》21（2009）</p>
+        <p>郭麗娟〈《佛說阿彌陀經疏鈔》「一心不亂」之研究〉，《中華佛學研究》3（1999）</p>
+        <p>王進健〈智旭的禪淨通和論〉，《華林國際佛學學刊》8:1（2025）</p>
+        <b>梵本與外文譯本</b>
+        <p>F. Max Müller &amp; Bunyiu Nanjio, <i>Sukhāvatī-vyūha</i>（Oxford, 1883）</p>
+        <p>Luis O. Gómez, <i>The Land of Bliss</i>（Hawai'i, 1996）</p>
+        <p>Inagaki Hisao, <i>The Three Pure Land Sutras</i>（Numata, 2003）</p>
+      </div></details>
+    <p class="sign">製作：Tally.C</p>
+  </div>
+
   <div id="v-count" class="view">
     <div class="top"><button class="pill" id="back">換珠／設定</button><span class="ttl" id="cnTitle"></span><button class="pill" id="toDays">記錄</button></div>
     <div id="stage"><canvas id="cv"></canvas>
       <div id="info"><div class="n" id="n">0</div><div class="name" id="nm"></div><div class="of">本圈 / 108　<span id="third"></span></div></div></div>
     <div class="stats"><span>今日<b id="sToday">0</b></span><span>累計<b id="sTotal">0</b></span><span>圈數<b id="sRound">0</b></span></div>
     <div class="hint" id="hint">點畫面任何地方，撥一顆</div>
-    <div class="cnact"><button class="pill" id="cnFocus">專注時段</button><button class="pill hi" id="cnBl" style="display:none">迴向</button></div>
+    <div class="cnact"><button class="pill" id="cnHelp">用法</button><button class="pill" id="cnFocus">專注時段</button><button class="pill hi" id="cnBl" style="display:none">迴向</button></div>
     <div class="bottom"><button class="pill" id="undo">復原</button><div class="seg" id="handQuick"><button data-v="L">左手</button><button data-v="R">右手</button></div><button class="pill" id="wake">常亮 關</button></div>
   </div>
 
   <div id="v-read" class="view read">
     <div class="top"><button class="pill" id="fsm">字 小</button><button class="pill" id="fbg">字 大</button></div>
     <div id="rd-art"><span class="ph" id="rd-ph"></span></div>
-    <div id="rd-body"><h2 id="rd-title"></h2><div class="ln" id="rd-ln"></div><div id="rd-gist"></div>
+    <div id="rd-body"><h2 id="rd-title"></h2><button class="pill rdDeep" id="rdDeep">深入：大家怎麼說 ›</button><div class="ln" id="rd-ln"></div><div id="rd-gist"></div>
       <div id="rd-sutra"></div><span class="lab">白話</span><div id="rd-plain"></div>
       <span class="lab">名詞小辭典</span><div class="gl" id="rd-gl"></div><div id="rd-sy"></div>
       <p class="note" style="margin-top:18px">經文：CBETA T12n0366《佛說阿彌陀經》姚秦 鳩摩羅什譯（已去除校勘註碼）。白話與名詞解釋為本工具依通行說法整理，尚未逐條對照辭典，只是幫助理解，請以經文為準。</p></div>
@@ -495,6 +536,19 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <button class="big alt" id="wlX">關閉</button>
     <button class="pill" id="wlNo" style="align-self:center;margin-top:6px">不再提醒</button>
   </div></div>
+  <div class="wl" id="cnHelpM"><div class="cd">
+    <h2>念佛的用法</h2>
+    <ul style="margin:6px 0 10px;padding-left:20px;line-height:1.9;font-size:15px">
+      <li><b>撥珠</b>：點畫面任何地方，撥一顆；按住時佛珠會放大。</li>
+      <li><b>念錯了</b>：按左下「復原」。左手、右手可在下方切換。</li>
+      <li><b>常亮</b>：按右下「常亮」，念佛時螢幕不熄。</li>
+      <li><b>迴向</b>：念了之後（一句也可以）會出現「迴向」鈕，不念不出現。</li>
+      <li><b>專注時段</b>：想靜心念佛後讀書、工作，按「專注時段」設定。</li>
+      <li><b>記錄</b>：右上「記錄」可看每天的數量。</li>
+    </ul>
+    <button class="big" id="cnHelpX">開始念佛</button>
+    <button class="pill" id="cnHelpNo" style="align-self:center;margin-top:6px">不再自動顯示</button>
+  </div></div>
   <div class="tpanel" id="tp"></div><div class="toast" id="toast"></div>
   <div class="disc">AI 協助撰寫，請自行判斷；不主張著作權，歡迎廣傳。</div>
   <div class="tabs">
@@ -502,7 +556,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <button data-t="read"><svg viewBox="0 0 32 32"><path d="M16 9c-3-2-7-3-11-3v16c4 0 8 1 11 3 3-2 7-3 11-3V6c-4 0-8 1-11 3zM16 9v16"/></svg>讀經</button>
     <button data-t="rec"><svg viewBox="0 0 32 32"><path d="M5 18a11 8 0 0 1 22 0c0 4-5 7-11 7S5 22 5 18zM11 18h10M22 8l3-3M10 8L7 5"/></svg>誦經</button>
     <button data-t="count"><svg viewBox="0 0 32 32"><path d="M16 6c-3 3-4 7-4 10s1 5 4 7c3-2 4-4 4-7s-1-7-4-10zM16 23c-4-1-8-4-9-9 3 0 6 1 8 3M16 23c4-1 8-4 9-9-3 0-6 1-8 3M6 25h20"/></svg>念佛</button>
-    <button data-t="bless"><svg viewBox="0 0 32 32"><path d="M16 26c-6-4-9-8-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-3 8-9 12z"/></svg>迴向</button>
+    <button data-t="deep"><svg viewBox="0 0 32 32"><circle cx="14" cy="14" r="7"/><path d="M19 19l7 7M11 14h6M14 11v6"/></svg>深入</button>
     <button data-t="set"><svg viewBox="0 0 32 32"><path d="M5 9h22M5 16h22M5 23h22"/><circle cx="11" cy="9" r="2.6"/><circle cx="21" cy="16" r="2.6"/><circle cx="13" cy="23" r="2.6"/></svg>設定</button>
   </div>
 </div>
@@ -728,10 +782,11 @@ window.addEventListener('resize',resize);
 
 function goTab(t){
   if(typeof ttsStop==='function')ttsStop();
+  if(t==='deep'&&typeof renderDeep==='function')renderDeep();
   if(t==='focus')renderFocus();
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+t));
-  if(t==='count')setTimeout(resize,0);
+  if(t==='count'){setTimeout(resize,0);if(!window._cnHelpSeen&&!store.get('cnHelpNo',0)){window._cnHelpSeen=1;$('#cnHelpM').classList.add('on')}}
   if(t==='days')renderDays();
   if(t==='read')renderRead();
   if(t==='rec')renderRec();
@@ -1149,6 +1204,12 @@ $('#wlNo').onclick=()=>{store.set('noRemind',1);closeWl()};
 $('#wlHelp').onclick=()=>{closeWl();goTab('help');$('#hpInstall').open=true;setTimeout(()=>$('#hpInstall').scrollIntoView({block:'start'}),50)};
 showWelcome();
 
+/* ===== 念佛用法彈窗 ===== */
+$('#cnHelp').onclick=()=>$('#cnHelpM').classList.add('on');
+$('#cnHelpX').onclick=()=>{window._cnHelpSeen=1;$('#cnHelpM').classList.remove('on')};
+$('#cnHelpNo').onclick=()=>{store.set('cnHelpNo',1);window._cnHelpSeen=1;$('#cnHelpM').classList.remove('on')};
+$('#cnHelpM').addEventListener('click',e=>{if(e.target.id==='cnHelpM')$('#cnHelpX').click()});
+
 /* ===== 專注時段（番茄鐘式） ===== */
 const FC={cfg:Object.assign({work:25,pre:0,brk:5,rnd:1,bell:1},store.get('fcCfg',{})),run:store.get('fcRun',null),tm:0,wl:null,ac:null};
 const fcMin=m=>m*60000;
@@ -1270,6 +1331,21 @@ $('#fcToBl').onclick=()=>{$('#v-focus').classList.remove('fin');goTab('bless')};
 $('#cnFocus').onclick=()=>goTab('focus');$('#cnBl').onclick=()=>goTab('bless');
 if(FC.run){FC.tm=setInterval(fcTick,500);fcHomeLbl()}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FC.run){fcTick();if(!FC.run)return;fcWake(!FC.run.paused)}});
+
+/* ===== 深入頁 ===== */
+let dpI=0;
+function dpFill(){const sel=$('#dpSel');if(!sel.options.length)UNITS.forEach((u,i)=>sel.add(new Option(`第 ${i+1} 段　${u.title.split('：')[0]}`,i)));sel.value=dpI}
+const DEEPSY={"1": ["「如是我聞」是阿難在結集時說的：這是我親耳聽佛說的。「一時」指的不是某年某月，而是不分地區的共同時間。祇樹給孤獨園，是須達長者以金鋪地買下、祇陀太子再供樹木，所以兩人名字並列。聽眾分三類：大比丘（千二百五十人是代表，十六位是最早證阿羅漢的大弟子）、菩薩（文殊代表智慧，彌勒代表成佛大願，乾陀訶提與常精進代表不休息、常精進）、天人。觀音、勢至沒有出現，因為這部經是釋迦佛在介紹，不是彌陀自己開場。", "336–350"], "2": ["別序點出主題：從娑婆往西、過十萬億佛土，有世界名極樂，佛號阿彌陀，現在正說法。佛特別對智慧第一的舍利弗說，顯示這個法門深而難信，需要大智慧。講記提醒：釋迦佛的涅槃是化身；報身、法身不涅槃，彌陀則是無量壽。", "350–352"], "3": ["娑婆有生老病死等八苦，更多是心與自己、與他人過不去的苦。極樂眾生「無有眾苦，但受諸樂」：那裡都是上善人，凡夫去了也沒有機會起煩惱；蓮花化生的身體不是肉身，所以沒有生老病死。蓮花是形容無漏業的清淨。", "353–354"], "4": ["欄楯、羅網、行樹、七寶池、八功德水，講記說都是形容，意思是我們在那裡隨時都在修行（七科對三十七道品，八功德水對八正道）。八功德：澄清、清涼、甘美、輕軟、潤澤、安和、除飢渴、長養諸根。人住自己的蓮花，彼此往來沒有妨礙，互相勉勵念佛、念法、念僧。", "354–357"], "5": ["天樂是清淨的音樂，曼陀羅花是天花。清晨各人以衣裓盛花供養十萬億佛，吃飯前就回來。講記說，這是借人間作息打的比方，實際是以禪悅、法食為食：聽法、修行、供養、經行，一個接著一個。", "357–358"], "6": ["白鶴、孔雀、鸚鵡等鳥，唱的是三十七道品，聽到的人自然念佛念法念僧。講記特別提醒：有人認為既然鳥都在說，人間就不必修；但正因如此，在人間先熟悉，往生才穩。經說這些鳥不是罪報所生，是彌陀願力變化，連風吹寶樹寶網的聲音，也像百千種樂器同時演奏，聽了就想起三寶。", "358–369"], "7": ["阿彌陀的意思有無量光與無量壽。光是慈悲與智慧的影響力，好心待人就是在放光；壽命無量指報身有始無終。極樂的人民也無量壽，因為不退轉。成佛十劫，在無量劫中算新的淨土。", "369–372"], "8": ["往生者很多是阿羅漢，也有菩薩。講記區分：中品往生者先現聲聞相、再證阿羅漢；也有迴小向大的人，雖發了菩提心仍示現聲聞相。「阿鞞跋致」是不退轉，分位不退、行不退、念不退。「諸上善人」是一生補處等菩薩，所以勸大家發願：能與這麼多善人同在一處。講記又說，在家也可以把家人看成上善人來相處。", "372–376"], "9": ["「不可以少善根福德因緣」。講記引兩種說法：蓮池大師說念佛念得少就是少善根福德；蕅益大師說善根是三十七道品，福德是布施、持戒、忍辱等助道，正助雙修才是淨土資糧。", "376–377"], "10": ["持名是最簡單的方法，但信、願、毅力要夠。一日到七日，與善根福德深淺有關。講記說：事一心不亂能決定往生（生凡聖同居土），理一心不亂更高；臨終要心不顛倒，也就是不被財物、親人、名利牽住。另有臨終十念等方便，講記也引《觀經》說十惡五逆者仍可稱名往生，並提醒不要因此偷懶，能念的時候要先念。", "377–381"], "11": ["先說阿彌陀佛不可思議功德：橫超三界、橫具四土、持名簡易、七日可成、念一佛得十方諸佛護念（蕅益的說法）。再列東南西北下上六方諸佛，各出廣長舌相說誠實語。講記說名號只是代表，實際是恆河沙數，並說「廣長舌相」是形容說法普及三千大千世界。", "381–389"], "12": ["聽聞此經、受持（讀誦並實踐）、聽到諸佛名的人，都被十方諸佛護念。護是愛護，念是憶念，像母親心裡常記著不在身邊的孩子。講記說：沒有人關心你時，還有一切諸佛在護念。", "389–390"], "13": ["勸願：聽了之後要生信、發願，而且念念發願。已發願、正發願、將發願的人，都能不退轉。講記說三種不退是位不退、行不退、念不退，往生要繼續發願。《無量壽經》第十九願也呼應；但仍要在能念、能修的時候先做。", "391–394"], "14": ["釋迦佛在五濁惡世（劫濁、見濁、煩惱濁、眾生濁、命濁）說這個容易卻難信的法門，所以十方諸佛稱讚。講記說：淨土是先得解脫、再度眾生，並不違背因果；娑婆的「堪忍」是明明苦仍想要，所以更要看清。老苦、病苦多在心不甘願，換個角度，苦就輕了。", "394–399"]};
+function renderDeep(){
+  dpFill();
+  const sy=DEEPSY[dpI+1];
+  const c1=sy?`<div class="dpcard"><b>聖嚴法師怎麼說</b><span>${sy[0]}</span><small style="display:block;margin-top:6px;opacity:.7">依《聖嚴法師教淨土法門》第四篇〈《阿彌陀經》講記〉（法鼓全集 冊05-10 頁 ${sy[1]}）改寫，已逐段對照原文。</small></div>`:`<div class="dpcard"><b>聖嚴法師怎麼說</b><span>準備中：逐則對照原文、改寫成白話並附出處後開放。</span></div>`;
+  $('#dpCards').innerHTML=c1+['蕅益大師怎麼看（《要解》）','蓮池大師怎麼看（《疏鈔》）'].map(t=>`<div class="dpcard"><b>${t}</b><span>準備中：逐則對照原文、改寫成白話並附出處後開放。</span></div>`).join('')+`<button class="pill" id="dpBack" style="margin-top:6px">‹ 回到第 ${dpI+1} 段經文</button>`;
+  $('#dpBack').onclick=()=>{rdI=dpI;store.set('rdI',rdI);goTab('read')};
+}
+function goDeep(i){dpI=i;goTab('deep');const d=$('#dpD1');if(d)d.open=true;$('#v-deep').scrollTop=0}
+$('#dpSel').onchange=e=>{dpI=+e.target.value;renderDeep()};
+$('#rdDeep').onclick=()=>goDeep(rdI);
 </script>
 </body>
 </html>
