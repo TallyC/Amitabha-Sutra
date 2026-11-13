@@ -253,6 +253,36 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .rcbar i.ln{background:linear-gradient(#f9dfa8,#e5b459)}
 .rcbar i.kn{background:linear-gradient(#ea9a8e,#c9705a)}
 .rcbar .hd{position:absolute;top:4px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:#fffaf4;border:3px solid var(--accent);box-shadow:0 3px 8px rgba(120,60,40,.3);pointer-events:none;transition:left .12s;left:0}
+
+.hrow{display:flex;align-items:center;justify-content:center;gap:10px;flex:none;flex-wrap:wrap}
+.hfocus{border:1px solid #d9b98f;border-radius:999px;background:rgba(255,250,244,.92);color:var(--ink);font-size:calc(14.5px*var(--ui2,1));letter-spacing:.1em;padding:6px 14px;flex:none}
+#v-focus .fcset{display:flex;flex-direction:column;gap:14px}
+#v-focus .fcrow{display:flex;flex-direction:column;gap:6px}
+#v-focus .fcrow>b{font-size:calc(16px*var(--ui,1));font-weight:500;color:var(--ink)}
+#v-focus .chips{display:flex;flex-wrap:wrap;gap:8px}
+#v-focus .chips button{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:9px 16px;font-size:calc(16px*var(--ui,1));color:var(--soft)}
+#v-focus .chips button.on{border-color:var(--accent);color:var(--accent);background:#fff6ee;font-weight:500}
+#v-focus input[type=number]{width:84px;border:1px solid var(--line);border-radius:12px;padding:8px;font-size:calc(16px*var(--ui,1));background:var(--glass);color:var(--ink)}
+#fcRun{display:none;flex-direction:column;align-items:center;gap:12px;padding-top:6px}
+#v-focus.run #fcSet{display:none}#v-focus.run #fcRun{display:flex}
+#fcPh{font-size:calc(18px*var(--ui,1));letter-spacing:.3em;color:var(--accent)}
+#fcRing{position:relative;width:min(72vw,280px);aspect-ratio:1}
+#fcRing svg{width:100%;height:100%;transform:rotate(-90deg)}
+#fcRing .tr{fill:none;stroke:#f0e2d3;stroke-width:12}
+#fcRing .pg{fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .3s linear}
+#fcTime{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(46px*var(--ui2,1));font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:.04em}
+#fcTime small{font-size:calc(15px*var(--ui2,1));color:var(--soft);letter-spacing:.1em;margin-top:2px}
+#fcDoneT{white-space:pre-line}
+#fcMsg{text-align:center;color:var(--soft);font-size:calc(15px*var(--ui,1));line-height:1.8;min-height:3.2em}
+#fcBtns{display:flex;gap:10px;width:100%}#fcBtns .big{margin:0;flex:1}
+#fcDone{display:none;flex-direction:column;align-items:center;gap:10px;text-align:center}
+#v-focus.fin #fcRun{display:none}#v-focus.fin #fcSet{display:none}#v-focus.fin #fcDone{display:flex}
+.cnact{display:flex;justify-content:center;gap:10px;flex:none;padding:4px 0 2px}
+.cnact .pill{padding:8px 18px;font-size:calc(15.5px*var(--ui2,1))}
+.cnact .pill.hi{border-color:var(--accent);color:#fff;background:linear-gradient(135deg,#d58a6f,#c9705a);animation:cnIn .5s ease both}
+@keyframes cnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#cv{transition:transform .16s cubic-bezier(.3,1.4,.5,1)}
+#stage.lift #cv{transform:scale(1.14) translateY(-6px);filter:drop-shadow(0 10px 14px rgba(120,70,40,.28))}
 </style>
 </head>
 <body>
@@ -345,12 +375,41 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <p class="sign">製作：Tally.C</p>
   </div>
 
+  <div id="v-focus" class="view pad hp">
+    <div class="top"><button class="pill" id="fcBack">返回</button><span class="ttl">專注時段</span><span></span></div>
+    <div id="fcSet" class="fcset">
+      <p class="lead">先靜心念佛，再專心做事；時間到，鐘聲提醒。讀書、工作都可以。</p>
+      <div class="fcrow"><b>專注幾分鐘</b><div class="chips" id="fcWork"><button data-v="15">15</button><button data-v="25">25</button><button data-v="45">45</button><button data-v="0" id="fcCustomB">自訂</button></div><div id="fcCustom" style="display:none"><input type="number" id="fcCustomN" min="1" max="180" value="30" inputmode="numeric"> 分鐘</div></div>
+      <div class="fcrow"><b>開始前靜心念佛</b><div class="chips" id="fcPre"><button data-v="0">不需要</button><button data-v="1">1 分鐘</button><button data-v="3">3 分鐘</button></div></div>
+      <div class="fcrow"><b>休息</b><div class="chips" id="fcBrk"><button data-v="0">不休息</button><button data-v="5">5 分鐘</button><button data-v="10">10 分鐘</button></div></div>
+      <div class="fcrow"><b>重複幾輪</b><div class="chips" id="fcRnd"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+      <div class="fcrow"><b>鐘聲</b><div class="chips" id="fcBell"><button data-v="1">開</button><button data-v="0">關</button></div></div>
+      <button class="big" id="fcGo">開始</button>
+      <p class="note" id="fcNote"></p>
+      <p class="note">時間以手機時鐘計算，離開本頁或鎖屏也會繼續算；開始後會讓螢幕保持常亮，這樣鐘聲才不會漏掉。</p>
+    </div>
+    <div id="fcRun">
+      <div id="fcPh"></div>
+      <div id="fcRing"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="52"/><circle class="pg" id="fcPg" cx="60" cy="60" r="52"/></svg><div id="fcTime"><span id="fcT">25:00</span><small id="fcRd"></small></div></div>
+      <div id="fcMsg"></div>
+      <div id="fcBtns"><button class="big alt" id="fcPause">暫停</button><button class="big alt" id="fcStop">結束</button></div>
+    </div>
+    <div id="fcDone">
+      <h2 style="margin:6px 0 0">專注完成</h2>
+      <p class="lead" id="fcDoneT"></p>
+      <button class="big" id="fcToBl">迴向</button>
+      <button class="big alt" id="fcAgain">再來一輪</button>
+      <button class="pill" id="fcHome">回念佛</button>
+    </div>
+  </div>
+
   <div id="v-count" class="view">
     <div class="top"><button class="pill" id="back">換珠／設定</button><span class="ttl" id="cnTitle"></span><button class="pill" id="toDays">記錄</button></div>
     <div id="stage"><canvas id="cv"></canvas>
       <div id="info"><div class="n" id="n">0</div><div class="name" id="nm"></div><div class="of">本圈 / 108　<span id="third"></span></div></div></div>
     <div class="stats"><span>今日<b id="sToday">0</b></span><span>累計<b id="sTotal">0</b></span><span>圈數<b id="sRound">0</b></span></div>
     <div class="hint" id="hint">點畫面任何地方，撥一顆</div>
+    <div class="cnact"><button class="pill" id="cnFocus">專注時段</button><button class="pill hi" id="cnBl" style="display:none">迴向</button></div>
     <div class="bottom"><button class="pill" id="undo">復原</button><div class="seg" id="handQuick"><button data-v="L">左手</button><button data-v="R">右手</button></div><button class="pill" id="wake">常亮 關</button></div>
   </div>
 
@@ -626,6 +685,7 @@ function resize(){const r=cv.getBoundingClientRect();if(!r.width)return;
 
 /* ---------- 計數 ---------- */
 function render(){const m=((S.total%N)+N)%N;
+  if($('#cnBl'))$('#cnBl').style.display=todayN()>0?'':'none';
   $('#n').textContent=m;$('#third').textContent=['●○○','○●○','○○●'][Math.floor(m/36)%3].split('').join(' ');$('#sToday').textContent=todayN();$('#sTotal').textContent=S.total.toLocaleString();
   $('#sRound').textContent=Math.floor(S.total/N);$('#nm').textContent=S.name}
 function save(){store.set('total',S.total);store.set('hist',hist)}
@@ -655,7 +715,8 @@ function add(){
 }
 function undo(){if(S.total<=0||todayN()<=0)return;S.total--;hist[dstr()]=todayN()-1;save();render();kick()}
 function startCount(){MIR=S.hand==='R';pos=S.total;vel=0;render();setTimeout(resize,0)}
-$('#v-count').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();add()});
+$('#v-count').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();$('#stage').classList.add('lift');add()});
+['pointerup','pointercancel','pointerleave'].forEach(ev=>document.addEventListener(ev,()=>$('#stage').classList.remove('lift')));
 $('#undo').onclick=undo;
 function syncHand(){document.querySelectorAll('#handQuick button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.hand))}
 document.querySelectorAll('#handQuick button').forEach(b=>b.onclick=()=>{S.hand=b.dataset.v;store.set('hand',S.hand);MIR=S.hand==='R';syncHand();resize()});
@@ -667,6 +728,7 @@ window.addEventListener('resize',resize);
 
 function goTab(t){
   if(typeof ttsStop==='function')ttsStop();
+  if(t==='focus')renderFocus();
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+t));
   if(t==='count')setTimeout(resize,0);
@@ -1086,6 +1148,128 @@ $('#wlX').onclick=closeWl;
 $('#wlNo').onclick=()=>{store.set('noRemind',1);closeWl()};
 $('#wlHelp').onclick=()=>{closeWl();goTab('help');$('#hpInstall').open=true;setTimeout(()=>$('#hpInstall').scrollIntoView({block:'start'}),50)};
 showWelcome();
+
+/* ===== 專注時段（番茄鐘式） ===== */
+const FC={cfg:Object.assign({work:25,pre:0,brk:5,rnd:1,bell:1},store.get('fcCfg',{})),run:store.get('fcRun',null),tm:0,wl:null,ac:null};
+const fcMin=m=>m*60000;
+function fcBell(n=1){
+  if(!FC.cfg.bell)return;
+  try{
+    FC.ac=FC.ac||new (window.AudioContext||window.webkitAudioContext)();
+    const a=FC.ac;if(a.state==='suspended')a.resume();
+    for(let k=0;k<n;k++){
+      const t0=a.currentTime+k*1.6,g=a.createGain();g.connect(a.destination);
+      g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.35,t0+.02);g.gain.exponentialRampToValueAtTime(.0008,t0+3.2);
+      [[392,1],[784,.35],[1176,.15]].forEach(([f,v])=>{const o=a.createOscillator(),gg=a.createGain();o.type='sine';o.frequency.value=f;gg.gain.value=v;o.connect(gg);gg.connect(g);o.start(t0);o.stop(t0+3.3)});
+    }
+  }catch(e){}
+  try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+}
+async function fcWake(on){try{if(on&&navigator.wakeLock&&!FC.wl){FC.wl=await navigator.wakeLock.request('screen');FC.wl.addEventListener('release',()=>{FC.wl=null})}else if(!on&&FC.wl){await FC.wl.release();FC.wl=null}}catch(e){}}
+function fcPhases(c){
+  const L=[];if(c.pre>0)L.push({k:'pre',m:c.pre,r:0});
+  for(let r=1;r<=c.rnd;r++){L.push({k:'work',m:c.work,r});if(c.brk>0&&r<c.rnd)L.push({k:'brk',m:c.brk,r})}
+  return L;
+}
+function fcSave(){store.set('fcRun',FC.run)}
+function fcStart(){
+  const c=Object.assign({},FC.cfg),L=fcPhases(c);
+  FC.run={cfg:c,i:0,end:Date.now()+fcMin(L[0].m),paused:0,start:Date.now(),worked:0};
+  fcSave();fcWake(true);fcBell(1);fcShow();
+}
+function fcAdvance(now){
+  const R=FC.run,L=fcPhases(R.cfg);let chimed=false;
+  while(!R.paused&&now>=R.end){
+    if(L[R.i].k==='work')R.worked+=L[R.i].m;
+    R.i++;
+    if(R.i>=L.length){FC.run=null;store.remove?store.remove('fcRun'):localStorage.removeItem('amt_fcRun');fcFinish(R);return true}
+    R.end+=fcMin(L[R.i].m);chimed=true;
+  }
+  if(chimed){fcBell(L[R.i].k==='work'?2:1);fcSave()}
+  return false;
+}
+function fcFinish(R){
+  clearInterval(FC.tm);FC.tm=0;fcWake(false);fcBell(3);
+  const d=store.get('fcDay',{});const k=dstr();d[k]=(d[k]||0)+R.worked;store.set('fcDay',d);
+  $('#fcDoneT').textContent=`這次專注了 ${R.worked} 分鐘。\n把這份用心，迴向給需要的人。`;
+  $('#v-focus').classList.remove('run');$('#v-focus').classList.add('fin');fcHomeLbl();
+}
+function fcTick(){
+  const R=FC.run;if(!R)return;
+  if(fcAdvance(Date.now()))return;
+  fcDraw();
+}
+function fcDraw(){
+  const R=FC.run;if(!R)return;
+  const L=fcPhases(R.cfg),ph=L[R.i],left=R.paused?R.paused:Math.max(0,R.end-Date.now()),tot=fcMin(ph.m);
+  const sec=Math.ceil(left/1000),mm=String(Math.floor(sec/60)).padStart(2,'0'),ss=String(sec%60).padStart(2,'0');
+  $('#fcT').textContent=mm+':'+ss;
+  const C=2*Math.PI*52;$('#fcPg').style.strokeDasharray=C;$('#fcPg').style.strokeDashoffset=C*(1-left/tot);
+  const nm={pre:'靜心念佛',work:'專注',brk:'休息'}[ph.k];
+  $('#fcPh').textContent=nm;
+  $('#fcRd').textContent=ph.k==='pre'?'南無阿彌陀佛':(R.cfg.rnd>1?`第 ${ph.r} / ${R.cfg.rnd} 輪`:'');
+  $('#fcMsg').textContent={pre:'先念幾句佛號，讓心靜下來。',work:'專心做眼前這件事。念頭跑掉了，輕輕帶回來就好。',brk:'起來走走、喝口水，讓眼睛休息一下。'}[ph.k];
+  $('#fcPause').textContent=R.paused?'繼續':'暫停';
+  fcHomeLbl();
+}
+function fcHomeLbl(){
+  const R=FC.run,e=$('#cnFocus');if(!e)return;
+  if(!R){e.textContent='專注時段';return}
+  const left=R.paused||Math.max(0,R.end-Date.now()),s=Math.ceil(left/1000);
+  e.textContent='專注中　'+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+function fcShow(){
+  $('#v-focus').classList.remove('fin');$('#v-focus').classList.add('run');
+  clearInterval(FC.tm);FC.tm=setInterval(fcTick,500);fcDraw();
+}
+function fcSync(){
+  const c=FC.cfg;
+  const mark=(id,v)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',+b.dataset.v===v));
+  const std=[15,25,45].includes(c.work);
+  document.querySelectorAll('#fcWork button').forEach(b=>b.classList.toggle('on',std?+b.dataset.v===c.work:b.id==='fcCustomB'));
+  $('#fcCustom').style.display=std?'none':'block';if(!std)$('#fcCustomN').value=c.work;
+  mark('fcPre',c.pre);mark('fcBrk',c.brk);mark('fcRnd',c.rnd);mark('fcBell',c.bell);
+  const L=fcPhases(c),tot=L.reduce((a,x)=>a+x.m,0);
+  const d=store.get('fcDay',{}),td=d[dstr()]||0;
+  $('#fcNote').textContent=`全部約 ${tot} 分鐘。`+(td?` 今天已專注 ${td} 分鐘。`:'');
+  $('#fcGo').textContent=`開始（約 ${tot} 分鐘）`;
+}
+function renderFocus(){
+  if(FC.run){
+    if(fcAdvance(Date.now()))return;
+    if(FC.run){fcShow();return}
+  }
+  if(!$('#v-focus').classList.contains('fin')){$('#v-focus').classList.remove('run');fcSync()}
+}
+function fcCfgSet(k,v){FC.cfg[k]=v;store.set('fcCfg',FC.cfg);fcSync()}
+[['fcWork','work'],['fcPre','pre'],['fcBrk','brk'],['fcRnd','rnd'],['fcBell','bell']].forEach(([id,k])=>{
+  document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{
+    if(id==='fcWork'&&b.id==='fcCustomB'){$('#fcCustom').style.display='block';fcCfgSet('work',Math.min(180,Math.max(1,+$('#fcCustomN').value||30)));return}
+    fcCfgSet(k,+b.dataset.v);if(k==='bell'&&+b.dataset.v)fcBell(1);
+  });
+});
+$('#fcCustomN').onchange=()=>fcCfgSet('work',Math.min(180,Math.max(1,+$('#fcCustomN').value||30)));
+$('#fcGo').onclick=fcStart;
+$('#fcPause').onclick=()=>{
+  const R=FC.run;if(!R)return;
+  if(R.paused){R.end=Date.now()+R.paused;R.paused=0;fcWake(true)}else{R.paused=Math.max(1000,R.end-Date.now());fcWake(false)}
+  fcSave();fcDraw();
+};
+$('#fcStop').onclick=()=>{
+  const R=FC.run;if(!R)return;
+  if(!confirm('要結束這次專注嗎？已專注的時間會保留。'))return;
+  const L=fcPhases(R.cfg);let w=R.worked;
+  if(L[R.i].k==='work'){const spent=fcMin(L[R.i].m)-(R.paused||Math.max(0,R.end-Date.now()));w+=Math.floor(spent/60000)}
+  R.worked=w;FC.run=null;localStorage.removeItem('amt_fcRun');
+  if(w>0)fcFinish(R);else{clearInterval(FC.tm);FC.tm=0;fcWake(false);$('#v-focus').classList.remove('run');fcSync();fcHomeLbl()}
+};
+$('#fcBack').onclick=()=>goTab('count');
+$('#fcHome').onclick=()=>{$('#v-focus').classList.remove('fin');goTab('count')};
+$('#fcAgain').onclick=()=>{$('#v-focus').classList.remove('fin');fcSync()};
+$('#fcToBl').onclick=()=>{$('#v-focus').classList.remove('fin');goTab('bless')};
+$('#cnFocus').onclick=()=>goTab('focus');$('#cnBl').onclick=()=>goTab('bless');
+if(FC.run){FC.tm=setInterval(fcTick,500);fcHomeLbl()}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FC.run){fcTick();if(!FC.run)return;fcWake(!FC.run.paused)}});
 </script>
 </body>
 </html>
