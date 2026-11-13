@@ -89,8 +89,16 @@ textarea,input[type=text],input[type=number]{width:100%;border:1px solid var(--l
 .rdtop .pill{flex:none;padding:6px 10px}
 .rdsel{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;background:var(--glass);color:var(--ink);padding:6px 10px;font-size:calc(14.5px*var(--ui,1))}
 #rd-sutra p,#rd-plain p{margin:0}
-#v-read.pg-std #rd-sutra p,#v-read.pg-std #rd-plain p{margin-bottom:.45em}
-#v-read.pg-loose #rd-sutra p,#v-read.pg-loose #rd-plain p{margin-bottom:1em}
+.pg-std #rd-sutra p,.pg-std #rd-plain p{margin-bottom:.45em}
+.pg-loose #rd-sutra p,.pg-loose #rd-plain p{margin-bottom:1em}
+.pgap{display:block;height:.5em}
+#rc-full{position:relative}
+#rc-full>*{position:relative;z-index:1}
+#rc-full>.fl-bg{position:absolute;inset:-12px -16px;z-index:0;background:center/cover no-repeat;opacity:0;transition:opacity .6s;pointer-events:none}
+#rc-full>.fl-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(253,241,229,.80),rgba(253,241,229,.88))}
+#rc-full.going>.fl-bg{opacity:1}
+.fl-art{transition:height .45s ease,min-height .45s ease,margin .45s ease,opacity .35s ease}
+#rc-full.going .fl-art{height:0;min-height:0;margin:0;opacity:0;box-shadow:none}
 #rd-body h2{margin:6px 0 2px;font-size:20px;font-weight:600;letter-spacing:.08em}
 #rd-body .ln{font-size:calc(12.5px*var(--ui,1));color:var(--soft);letter-spacing:.12em;margin-bottom:8px}
 #rd-gist{font-size:calc(16px*var(--ui,1));color:#b07b60;margin:2px 0 10px;letter-spacing:.06em}
@@ -180,7 +188,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .bl-hero .l{font-size:21px;letter-spacing:.12em;line-height:calc(1.7*var(--lh,1));color:#6d4331}
 .bl-hero .s{font-size:calc(14.5px*var(--ui,1));color:#7a5a48;letter-spacing:.12em}
 .fl{background:linear-gradient(#fdf1e5,#f9e6da);position:relative}
-.fl-art{position:relative;flex:none;height:27vh;min-height:150px;border-radius:26px;overflow:hidden;box-shadow:0 12px 30px rgba(120,80,50,.2);margin:4px 0 12px}
+.fl-art{position:relative;flex:none;height:19vh;min-height:110px;border-radius:26px;overflow:hidden;box-shadow:0 12px 30px rgba(120,80,50,.2);margin:4px 0 12px}
 .fl-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .fl-art::after{content:'';position:absolute;inset:0;border-radius:26px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
 .fl-t{text-align:center;font-size:19px;letter-spacing:.14em;font-weight:600;margin:2px 0}
@@ -400,7 +408,7 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <p class="lead">這裡的設定，整個工具都會套用。</p>
     <div class="setbox"><b>字體大小</b><div class="seg uiSeg"><button data-v="1">標準</button><button data-v="1.15">大</button><button data-v="1.3">特大</button></div><p class="note" style="font-size:calc(17px*var(--ui,1))">預覽：如是我聞，一時佛在舍衛國祇樹給孤獨園。</p></div>
     <div class="setbox"><b>行距（文字鬆緊）</b><div class="seg lhSeg"><button data-v="0.9">緊</button><button data-v="1">標準</button><button data-v="1.15">鬆</button></div><p class="note">調整所有文字行與行之間的距離。</p></div>
-    <div class="setbox"><b>讀經的分段</b><div class="seg rdPgSeg"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div><p class="note">緊＝連成一段；標準＝依經文原有分行；鬆＝每一句分開，留較大空白。讀經頁上方「分段」鈕也能切換。</p></div>
+    <div class="setbox"><b>分段（讀經、誦經都套用）</b><div class="seg rdPgSeg"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div><p class="note">緊＝連成一段；標準＝依經文原有分行；鬆＝每一句分開，留較大空白。讀經頁、背誦小卡、整部經典上方的「分段」鈕也能切換。</p></div>
     <div class="setbox"><b>背誦的段落大小</b><div class="seg rcSizeSeg"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div><p class="note" id="stRcNote"></p></div>
     <div class="setbox"><b>語音報讀</b><button class="big alt" id="stTp" style="margin-top:8px">語音與唸法設定</button></div>
     <div class="setbox"><b>開啟時的提醒</b><div class="seg remindSeg"><button data-v="1">顯示</button><button data-v="0">不顯示</button></div><p class="note">還沒加到手機桌面時，打開會先顯示工具聲明與安裝提醒。</p></div>
@@ -873,9 +881,13 @@ function fmtPg(t){
   if(rdPg==='loose'){const o=[];ls.forEach(l=>l.replace(/([。！？；])/g,'$1\n').split('\n').forEach(x=>{x=x.trim();if(x)o.push(x)}));ls=o}
   return ls.map(x=>'<p>'+escH(x)+'</p>').join('');
 }
-function setRdPg(v){if(!PGL[v])return;rdPg=v;store.set('rdPg',v);syncRdPg();renderRead(true)}
-function syncRdPg(){const vr=$('#v-read');vr.classList.remove('pg-tight','pg-std','pg-loose');vr.classList.add('pg-'+rdPg);
-  $('#rdPgB').textContent='分段 '+PGL[rdPg];document.querySelectorAll('.rdPgSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===rdPg))}
+function setRdPg(v){if(!PGL[v])return;rdPg=v;store.set('rdPg',v);syncRdPg();renderRead(true);if(typeof toast==='function'&&window._pgToast)toast('分段：'+PGL[v])}
+function pgText(h){h=String(h);
+  if(rdPg==='tight')return h.replace(/\n+/g,'');
+  if(rdPg==='loose')return h.replace(/([。！？；：])\n*/g,'$1\n\n').replace(/\n+$/,'');
+  return h.replace(/([。！？])(?!\n)/g,'$1\n').replace(/\n+$/,'');}
+function syncRdPg(){const vr=document.documentElement;vr.classList.remove('pg-tight','pg-std','pg-loose');vr.classList.add('pg-'+rdPg);
+  $('#rdPgB').textContent='分段 '+PGL[rdPg];if(window.onPgChange)window.onPgChange();document.querySelectorAll('.rdPgSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===rdPg))}
 function renderRead(keep){
   const u=UNITS[rdI];$('#rd-title').textContent=`${rdI+1}．${u.title}`;
   $('#rd-ln').textContent=`T12n0366　${u.line}`;$('#rd-gist').textContent=u.gist;
@@ -970,7 +982,7 @@ function nextCard(){
 function drawLearn(){
   ttsStop();
   const c=curCard,el=$('#rc-card');$('#rc-home').style.display='none';el.style.display='';
-  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　新段・先念三遍</div><div class="tx">${c.text}</div></div><div class="lr">跟著念，念完一遍按一下（${learnN}／3）</div>${ttsBar()}
+  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　新段・先念三遍</div><div class="tx">${pgText(c.text)}</div></div><div class="lr">跟著念，念完一遍按一下（${learnN}／3）</div>${ttsBar()}
    <button class="big" id="lr">${learnN>=3?'開始背':'念完一遍'}</button><button class="big alt" id="rcBack" style="margin-top:6px">先到這裡</button>`;
   ttsBind(el,()=>c.text);
   $('#lr').onclick=()=>{if(learnN>=3){curCard={...c,learn:0};drawCard()}else{learnN++;drawLearn()}};
@@ -980,9 +992,10 @@ function drawCard(){
   ttsStop();
   const c=curCard,st=(cards[c.id]||{s:0}).s;
   $('#rc-home').style.display='none';const el=$('#rc-card');el.style.display='';
-  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　${cards[c.id]?'複習':'新段'}</div><div class="tx" id="cx">${revealed?c.text:maskText(c.text,st)}</div></div>`+
+  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　${cards[c.id]?'複習':'新段'}</div><div class="tx" id="cx">${pgText(revealed?c.text:maskText(c.text,st))}</div></div><div style="text-align:right;margin:-4px 2px 4px"><button class="pill pgBtn">分段 ${PGL[rdPg]}</button></div>`+
    (revealed?`${ttsBar()}<div class="rate"><button class="f" data-r="f">忘了</button><button class="m" data-r="m">模糊</button><button class="g" data-r="g">記得</button></div>`:`<button class="big" id="rv">看答案</button>`)+
    `<button class="big alt" id="rcBack" style="margin-top:14px">先到這裡</button><p class="note">先試著念出來，再看答案。誠實按就好，沒有分數。</p>`;
+  el.querySelectorAll('.pgBtn').forEach(b=>b.onclick=()=>{setRdPg({tight:'std',std:'loose',loose:'tight'}[rdPg]);drawCard()});
   if(!revealed)$('#rv').onclick=()=>{revealed=true;drawCard()};
   else ttsBind(el,()=>c.text);
   document.querySelectorAll('.rate button').forEach(b=>b.onclick=()=>rate(b.dataset.r));
@@ -991,7 +1004,9 @@ function drawCard(){
 function rate(r){
   const c=curCard;let o=cards[c.id];if(!o){o={s:0,due:0};newd[dstr()]=newToday()+1}
   if(r==='g')o.s=Math.min(8,o.s+1);else if(r==='f')o.s=0;
-  o.due=Date.now()+INT[r==='m'?Math.max(0,o.s-1):o.s];cards[c.id]=o;saveRec();nextCard();
+  o.due=Date.now()+INT[r==='m'?Math.max(0,o.s-1):o.s];cards[c.id]=o;saveRec();
+  if(r!=='g'){queue.push({...c,learn:0});if(typeof toast==='function')toast(queue.length>1?'這段等一下會再出現，繼續背':'再背一次這段')}
+  nextCard();
 }
 
 /* ---------- 選段・緊鬆・語音報讀 ---------- */
@@ -1099,7 +1114,7 @@ function openTp(){
 /* ---------- 整部經典（逐段、逐句；原地更新不重繪） ---------- */
 const LOTUS_SVG='<svg viewBox="0 0 40 40"><g transform="translate(20 22)"><path d="M0 -14C-5 -8 -6 -2 0 6C6 -2 5 -8 0 -14Z" fill="#f4bfb5" stroke="#c9705a" stroke-width="1"/><path d="M-4 4C-14 2 -16 -6 -13 -10C-8 -8 -5 -3 -4 4Z" fill="#f7d6cc" stroke="#c9705a" stroke-width="1"/><path d="M4 4C14 2 16 -6 13 -10C8 -8 5 -3 4 4Z" fill="#f7d6cc" stroke="#c9705a" stroke-width="1"/></g></svg>';
 function startFull(from){
-  let ui=from??store.get('fullU',0),k=0,ph=[],sp=[];
+  let ui=from??store.get('fullU',0),k=0,ph=[],sp=[],going=false;
   const el=$('#rc-full');$('#v-rec').classList.add('fullmode');$('#rc-home').style.display='none';$('#rc-card').style.display='none';el.style.display='';
   const phr=i=>UNITS[i].sutra.replace(/\s+/g,'').replace('車𤦲','硨磲').split(/(?<=[，。；：！？、])/).filter(Boolean);
   const paint=first=>{
@@ -1113,11 +1128,12 @@ function startFull(from){
   const build=()=>{
     ttsStop();ph=phr(ui);k=0;store.set('fullU',ui);const u=UNITS[ui];
     el.innerHTML=`<div class="fl-prog" id="flp">${UNITS.map((_,i)=>`<i data-i="${i}"></i>`).join('')}</div>
-      <div class="fl-sel"><select class="sel" id="flSel" aria-label="選擇段落">${UNITS.map((x,i)=>`<option value="${i}">${i+1}．${head(x.sutra)}</option>`).join('')}</select><button class="pill" id="flSay">${SPK}報讀</button><button class="pill" id="flCfg">唸法</button></div>
+      <div class="fl-sel"><select class="sel" id="flSel" aria-label="選擇段落">${UNITS.map((x,i)=>`<option value="${i}">${i+1}．${head(x.sutra)}</option>`).join('')}</select><button class="pill" id="flSay">${SPK}報讀</button><button class="pill" id="flCfg">唸法</button><button class="pill" id="flPg">分段 ${PGL[rdPg]}</button></div>
+      <div class="fl-bg" style="background-image:url('${imgSrc(ui)}')"></div>
       <div class="fl-art"><img src="${imgSrc(ui)}" alt=""></div>
       <div class="fl-t">${ui+1}．${u.title}</div>
       <div class="fl-orn"><i></i>${LOTUS_SVG}<i></i></div>
-      <div class="fl-body" id="flb"><div class="follow">${ph.map(x=>`<span>${x}</span>`).join('')}</div></div>
+      <div class="fl-body" id="flb"><div class="follow">${ph.map(x=>`<span>${x}</span>`+(rdPg==='tight'?'':(rdPg==='loose'?(/[。！？；：]$/.test(x)?'<br><i class="pgap"></i>':''):(/[。！？]$/.test(x)?'<br>':'')))).join('')}</div></div>
       <div class="fl-bar"><button class="big alt" id="flBack">${ui?'‹ 上一段':'返回'}</button><button class="big" id="flNext"></button></div>`;
     sp=[...el.querySelectorAll('.follow span')];
     el.querySelectorAll('#flp i').forEach(d=>d.onclick=()=>{ui=+d.dataset.i;build()});
@@ -1125,11 +1141,14 @@ function startFull(from){
     $('#flSel').value=ui;$('#flSel').onchange=e=>{ui=+e.target.value;build()};
     TTS.upd=()=>{const g=$('#flSay');if(g){g.innerHTML=SPK+(TTS.on?'停止':'報讀');g.classList.toggle('on',TTS.on)}};
     $('#flCfg').onclick=()=>openTp();
-    $('#flSay').onclick=()=>{if(TTS.on){ttsStop();return}const s0=k>=ph.length?0:k;k=s0;paint();ttsSay('',{onIdx:j=>{k=s0+j;paint()},onEnd:()=>{k=ph.length;paint()}},ph.slice(s0))};
+    el.classList.toggle('going',going);
+    $('#flPg').onclick=()=>{const kk=k;setRdPg({tight:'std',std:'loose',loose:'tight'}[rdPg]);build();k=kk;paint(true)};
+    const goOn=()=>{if(!going){going=true;$('#rc-full').classList.add('going')}};$('#flb').addEventListener('scroll',()=>{if($('#flb').scrollTop>24)goOn()},{passive:true});
+    $('#flSay').onclick=()=>{if(TTS.on){ttsStop();return}goOn();const s0=k>=ph.length?0:k;k=s0;paint();ttsSay('',{onIdx:j=>{k=s0+j;paint()},onEnd:()=>{k=ph.length;paint()}},ph.slice(s0))};
     $('#flNext').onclick=step;paint(true);
   };
   const step=()=>{
-    ttsStop();if(k<ph.length){k++;paint();return}
+    ttsStop();if(!going){going=true;$('#rc-full').classList.add('going')}if(k<ph.length){k++;paint();return}
     const last=ui===UNITS.length-1;
     recU[ui]=(recU[ui]||0)+1;recd[dstr()]=(recd[dstr()]||0)+1;
     if(last){recAll++;store.set('recAll',recAll);store.set('fullU',0)}
