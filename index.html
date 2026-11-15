@@ -49,8 +49,8 @@ h2{font-size:calc(17.5px*var(--ui,1));margin:18px 0 6px;font-weight:600;letter-s
 #info .n{font-size:76px;line-height:1;font-weight:300;font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:.02em}
 #info .name{font-size:calc(19px*var(--ui2,1));color:#b07b60;letter-spacing:.45em;margin-top:8px;padding-left:.45em}
 #info .of{font-size:calc(14.5px*var(--ui2,1));color:var(--soft);margin-top:6px;letter-spacing:.1em}
-#info .n.pop{animation:pop .22s ease-out}
-@keyframes pop{0%{transform:scale(1.1)}100%{transform:scale(1)}}
+#info .n.pop{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(1.04);opacity:.75}100%{transform:scale(1);opacity:1}}
 .stats{display:flex;gap:20px;justify-content:center;padding:2px 0 2px;font-size:calc(14.5px*var(--ui2,1));color:var(--soft)}
 .stats b{color:var(--ink);font-weight:600;font-size:calc(16px*var(--ui2,1));margin-left:3px}
 .hint{font-size:calc(14.5px*var(--ui2,1));color:var(--soft);text-align:center;min-height:18px;letter-spacing:.1em}
@@ -89,8 +89,8 @@ textarea,input[type=text],input[type=number]{width:100%;border:1px solid var(--l
 .rdtop .pill{flex:none;padding:6px 10px}
 .rdsel{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;background:var(--glass);color:var(--ink);padding:6px 10px;font-size:calc(14.5px*var(--ui,1))}
 #rd-sutra p,#rd-plain p{margin:0}
-.pg-std #rd-sutra p,.pg-std #rd-plain p{margin-bottom:.45em}
-.pg-loose #rd-sutra p,.pg-loose #rd-plain p{margin-bottom:1em}
+.pg-std #rd-sutra p,.pg-std #rd-plain p{margin-bottom:.3em}
+.pg-loose #rd-sutra p,.pg-loose #rd-plain p{margin-bottom:.9em}
 .pgap{display:block;height:.5em}
 #rc-full{position:relative}
 #rc-full>*{position:relative;z-index:1}
@@ -132,6 +132,7 @@ textarea,input[type=text],input[type=number]{width:100%;border:1px solid var(--l
 .mcard .ti{font-size:calc(14.5px*var(--ui,1));color:var(--soft);letter-spacing:.15em;margin-bottom:8px}
 .mcard .tx{font-size:calc(21px*var(--fs,1)*var(--ui,1));line-height:calc(2.1*var(--lh,1));letter-spacing:.08em;white-space:pre-line;min-height:130px;color:var(--ink)}
 .mcard .tx i{font-style:normal;color:#d9c3b0}
+.mcard .ti .tis{display:block;margin-top:2px;font-size:.88em;letter-spacing:.04em;opacity:.85}
 .rate{display:flex;gap:8px;margin-top:10px}.rate button{flex:1;border:1.5px solid var(--line);background:var(--glass);border-radius:14px;padding:11px 4px;font-size:calc(16px*var(--ui,1));letter-spacing:.1em}
 .rate .g{border-color:#9bb98c;color:#5d7d4f}.rate .m{border-color:#e0b66a;color:#9a7421}.rate .f{border-color:#d49a88;color:#b0604a}
 .ulist{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
@@ -308,8 +309,8 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .cnact .pill{padding:8px 18px;font-size:calc(15.5px*var(--ui2,1))}
 .cnact .pill.hi{border-color:var(--accent);color:#fff;background:linear-gradient(135deg,#d58a6f,#c9705a);animation:cnIn .5s ease both}
 @keyframes cnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-#cv{transition:transform .16s cubic-bezier(.3,1.4,.5,1)}
-#stage.lift #cv{transform:scale(1.14) translateY(-6px);filter:drop-shadow(0 10px 14px rgba(120,70,40,.28))}
+#cv{transition:transform .5s cubic-bezier(.25,.1,.25,1)}
+#stage.lift #cv{transform:scale(1.015)}
 
 .dpsel{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:calc(16px*var(--ui,1));background:var(--glass);color:var(--ink);margin-top:6px}
 .dpcard{background:rgba(255,250,244,.92);border:1px solid #e6d3bd;border-radius:14px;padding:10px 14px;margin:8px 0;font-size:calc(15.5px*var(--ui,1));line-height:1.8}
@@ -318,7 +319,8 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 .dpsrc{display:block;margin-top:8px;font-size:calc(13px*var(--ui,1));line-height:1.7;color:#9a7d6a}.dpsrc a{display:inline-block;margin-top:4px;color:var(--accent);text-decoration:none;border:1px solid rgba(201,112,90,.4);border-radius:999px;padding:3px 12px}
 .dppend{padding:4px 2px}
 .dpbib b{display:block;margin-top:10px;font-weight:500;color:var(--accent)}
-.dpbib p{margin:4px 0;font-size:calc(15px*var(--ui,1));line-height:1.7;color:var(--ink)}
+.dpbib p{margin:4px 0 10px;font-size:calc(15px*var(--ui,1));line-height:1.7;color:var(--ink)}
+.dpbib p a{display:inline-block;margin:4px 0 0 6px;font-size:calc(13px*var(--ui,1));color:var(--accent);text-decoration:none;border:1px solid rgba(201,112,90,.4);border-radius:999px;padding:2px 10px;white-space:nowrap}
 .rdDeep{margin:2px 0 8px}
 </style>
 </head>
@@ -362,10 +364,11 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <details><summary>怎麼用</summary>
       <p><b>讀經</b>：15 段水彩繪本，左右滑動換段。每段有經文、白話、名詞小辭典；部分段落附法鼓山聖嚴法師開示的摘要與出處。右上角可調字級。</p>
       <p><b>誦經</b>：</p>
-      <ul><li><b>背誦小卡</b>：每天 1 段。先念三遍，再憑記憶背出來（字會逐步遮住），按「記得／模糊／忘了」，系統安排何時複習。</li>
-      <li><b>段落大小</b>：「緊」每段約 50 字、「標準」約 100 字、「鬆」約 200 字。三種各自記錄進度，隨時可以換。</li>
-      <li><b>換卡</b>：在卡片上左右滑動，就能換到前一段、下一段（整部經典也可以）。</li>
-      <li><b>選段落</b>：用下拉選單（顯示每段開頭幾個字）或在進度條上點選、滑動，選好按「背這段」。</li>
+      <ul><li><b>背誦小卡</b>：每天 1 張。先念三遍，再憑記憶背出來（字會逐步遮住），按「記得／模糊／忘了」，系統安排何時複習。</li>
+      <li><b>小卡字數</b>：「短」每張約 50 字、「中」約 100 字、「長」約 200 字。三種各自記錄進度，隨時可以換。</li>
+      <li><b>分段</b>：只管排版，「緊」連成一段、「標準」每句換行、「鬆」每個停頓換行並留空；讀經、背誦、整部經典都一樣。</li>
+      <li><b>換卡</b>：在小卡上左右滑動，就能換到前一張、下一張（整部經典則是換段）。</li>
+      <li><b>選小卡</b>：用下拉選單（顯示每張開頭幾個字）或在進度條上點選、滑動，選好按「背這張」。</li>
       <li><b>語音報讀</b>：按「報讀」聽手機唸這一段；可選慢／中／常速。念得不對可到「唸法」修改。</li>
       <li><b>整部經典</b>：一句一句誦完全經，按「念下一句」往下；上方下拉可跳到任一段。</li></ul>
       <p><b>念佛</b>：先選一串佛珠（選好才開始），點畫面任何地方撥一顆。每串珠數可設定（最多 36 顆），撥完一串算一圈；按「開始念佛」會開獨立畫面，左上「✕ 結束」才離開。可換左右手、換聖號、復原上一聲、螢幕常亮。沒有任何音效。</p>
@@ -407,9 +410,9 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <h2>設定</h2>
     <p class="lead">這裡的設定，整個工具都會套用。</p>
     <div class="setbox"><b>字體大小</b><div class="seg uiSeg"><button data-v="1">標準</button><button data-v="1.15">大</button><button data-v="1.3">特大</button></div><p class="note" style="font-size:calc(17px*var(--ui,1))">預覽：如是我聞，一時佛在舍衛國祇樹給孤獨園。</p></div>
-    <div class="setbox"><b>行距（文字鬆緊）</b><div class="seg lhSeg"><button data-v="0.9">緊</button><button data-v="1">標準</button><button data-v="1.15">鬆</button></div><p class="note">調整所有文字行與行之間的距離。</p></div>
-    <div class="setbox"><b>分段（讀經、誦經都套用）</b><div class="seg rdPgSeg"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div><p class="note">緊＝連成一段；標準＝依經文原有分行；鬆＝每一句分開，留較大空白。讀經頁、背誦小卡、整部經典上方的「分段」鈕也能切換。</p></div>
-    <div class="setbox"><b>背誦的段落大小</b><div class="seg rcSizeSeg"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div><p class="note" id="stRcNote"></p></div>
+    <div class="setbox"><b>行距</b><div class="seg lhSeg"><button data-v="0.9">窄</button><button data-v="1">標準</button><button data-v="1.15">寬</button></div><p class="note">調整所有文字行與行之間的距離。</p></div>
+    <div class="setbox"><b>分段（讀經、誦經都套用）</b><div class="seg rdPgSeg"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div><p class="note">緊＝經文連成一段；標準＝每一句（。！？）換一行；鬆＝每個停頓（。！？；：）都換行，並留較大空白。讀經頁、背誦小卡、整部經典上方的「分段」鈕也能切換，三處效果相同。</p></div>
+    <div class="setbox"><b>背誦小卡的字數</b><div class="seg rcSizeSeg"><button data-v="tight">短</button><button data-v="std">中</button><button data-v="loose">長</button></div><p class="note" id="stRcNote"></p></div>
     <div class="setbox"><b>語音報讀</b><button class="big alt" id="stTp" style="margin-top:8px">語音與唸法設定</button></div>
     <div class="setbox"><b>開啟時的提醒</b><div class="seg remindSeg"><button data-v="1">顯示</button><button data-v="0">不顯示</button></div><p class="note">還沒加到手機桌面時，打開會先顯示工具聲明與安裝提醒。</p></div>
     <button class="big alt" id="stHelp">使用說明・安裝・聲明</button>
@@ -453,26 +456,27 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
       <div class="dpcards" id="dpCards"></div></details>
     <details class="plan"><summary>② 兩個譯本並排</summary><p class="note dppend">準備中：羅什本與玄奘《稱讚淨土佛攝受經》同段對看，逐字核對後開放。</p></details>
     <details class="plan"><summary>③ 信願行小記錄</summary><p class="note dppend">準備中：只自我記錄，不計分、不比較。</p></details>
-    <details class="plan" hidden><summary>④ 一心不亂是什麼</summary><p class="note dppend">準備中：整理蓮池大師「事一心、理一心」的白話說明。</p></details>
-    <details class="plan" hidden><summary>⑤ 六方諸佛地圖</summary><p class="note dppend">準備中：可點的互動圖。</p></details>
-    <details class="plan" hidden><summary>⑥ 梵漢小對照</summary><p class="note dppend">準備中：只放對過梵本的少數名詞。</p></details>
-    <details class="plan" hidden><summary>⑦ 想再深入可以看</summary>
-      <p class="note">以下是目前查到的書目，只看過書目或摘要，還沒讀過全文；請當作找書的線索，不是結論。</p>
+    <details class="plan" hidden><summary>⑤ 一心不亂是什麼</summary><p class="note dppend">準備中：整理蓮池大師「事一心、理一心」的白話說明。</p></details>
+    <details class="plan" hidden><summary>⑥ 六方諸佛地圖</summary><p class="note dppend">準備中：可點的互動圖。</p></details>
+    <details class="plan" hidden><summary>⑦ 梵漢小對照</summary><p class="note dppend">準備中：只放對過梵本的少數名詞。</p></details>
+    <details class="plan"><summary>④ 想再深入可以看</summary>
+      <p class="note">每一條都附連結：標「全文」的可以直接讀；標「書目」的是圖書館或出版社的資料頁，可依此找書。列在這裡是找書的線索，不代表本工具已逐一讀完。</p>
       <div class="dpbib">
         <b>古德註疏</b>
-        <p>蕅益智旭《阿彌陀經要解》（收在《淨土十要》）</p>
-        <p>圓瑛《阿彌陀經要解講義》</p>
-        <p>袾宏（蓮池）《阿彌陀經疏鈔》</p>
-        <p>窺基《阿彌陀經通贊疏》；元照《阿彌陀經義疏》</p>
-        <p>聖嚴法師《聖嚴法師教淨土法門》第四篇《阿彌陀經》講記（法鼓全集 05-10）</p>
+        <p>蕅益智旭《佛說阿彌陀經要解》（收在《淨土十要》）<a href="https://cbetaonline.dila.edu.tw/zh/T1762" target="_blank" rel="noopener">全文：CBETA T1762 ↗</a></p>
+        <p>圓瑛《阿彌陀經要解講義》（臺北：佛陀教育基金會，1991）<a href="https://buddhism.lib.ntu.edu.tw/search/search_detail.jsp?seq=268226" target="_blank" rel="noopener">書目：臺大佛學數位圖書館 ↗</a></p>
+        <p>袾宏（蓮池）《阿彌陀經疏鈔》<a href="https://cbetaonline.dila.edu.tw/zh/X0424" target="_blank" rel="noopener">全文：CBETA X0424 ↗</a></p>
+        <p>窺基《阿彌陀經通贊疏》<a href="https://cbetaonline.dila.edu.tw/zh/T1758" target="_blank" rel="noopener">全文：CBETA T1758 ↗</a></p>
+        <p>元照《佛說阿彌陀經義疏》<a href="https://cbetaonline.dila.edu.tw/zh/T1761" target="_blank" rel="noopener">全文：CBETA T1761 ↗</a></p>
+        <p>聖嚴法師《聖嚴法師教淨土法門》第四篇〈《阿彌陀經》講記〉（法鼓全集 05-10）<a href="https://ddc.shengyen.org/?doc=05-10-022" target="_blank" rel="noopener">全文：法鼓全集 ↗</a></p>
         <b>現代研究</b>
-        <p>高婉瑜〈論《阿彌陀經》漢文異譯本的詞彙與篇章風格〉，《淡江中文學報》21（2009）</p>
-        <p>郭麗娟〈《佛說阿彌陀經疏鈔》「一心不亂」之研究〉，《中華佛學研究》3（1999）</p>
-        <p>王進健〈智旭的禪淨通和論〉，《華林國際佛學學刊》8:1（2025）</p>
+        <p>高婉瑜〈論《阿彌陀經》漢文異譯本的詞彙與篇章風格〉，《淡江中文學報》21（2009），頁 89–118<a href="https://buddhism.lib.ntu.edu.tw/FT/JA/652847.pdf" target="_blank" rel="noopener">全文 PDF ↗</a></p>
+        <p>郭麗娟〈《佛說阿彌陀經疏鈔》「一心不亂」之研究〉，《中華佛學研究》3（1999），頁 107–173<a href="https://buddhism.lib.ntu.edu.tw/FULLTEXT/JR-AN/an336933.pdf" target="_blank" rel="noopener">全文 PDF ↗</a></p>
+        <p>王進健〈智旭的禪淨通和論〉，《華林國際佛學學刊》8:1（2025），頁 260–275<a href="https://glorisunglobalnetwork.org/wp-content/uploads/2026/05/hualinc8.1_wang_jinjian.pdf" target="_blank" rel="noopener">全文 PDF ↗</a></p>
         <b>梵本與外文譯本</b>
-        <p>F. Max Müller &amp; Bunyiu Nanjio, <i>Sukhāvatī-vyūha</i>（Oxford, 1883）</p>
-        <p>Luis O. Gómez, <i>The Land of Bliss</i>（Hawai'i, 1996）</p>
-        <p>Inagaki Hisao, <i>The Three Pure Land Sutras</i>（Numata, 2003）</p>
+        <p>F. Max Müller &amp; Bunyiu Nanjio, <i>Sukhāvatī-vyūha</i>（Oxford, 1883；附小本梵文）<a href="https://archive.org/details/BuddhistTextsFromJapan" target="_blank" rel="noopener">全文：Internet Archive（合訂重印本） ↗</a></p>
+        <p>Luis O. Gómez, <i>The Land of Bliss</i>（Hawai'i, 1996）<a href="https://buddhism.lib.ntu.edu.tw/search/search_detail.jsp?seq=545591" target="_blank" rel="noopener">書目：臺大佛學數位圖書館 ↗</a></p>
+        <p>Inagaki Hisao, <i>The Three Pure Land Sutras</i>（Numata, 2003）<a href="https://bdkamerica.org/product/the-three-pure-land-sutras/" target="_blank" rel="noopener">全文：BDK America 免費 PDF ↗</a></p>
       </div></details>
     <p class="sign">製作：Tally.C</p>
   </div>
@@ -500,15 +504,15 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <h2>誦經</h2>
     <div id="rc-home">
       <p class="note" id="rcIntro"></p>
-      <div class="tiles"><div class="tile"><b id="rcDue">0</b><span>待複習</span></div><div class="tile"><b id="rcNew">0</b><span>今日新段</span></div><div class="tile"><b id="rcKnown">0</b><span>已背</span></div></div>
+      <div class="tiles"><div class="tile"><b id="rcDue">0</b><span>待複習</span></div><div class="tile"><b id="rcNew">0</b><span>今日新卡</span></div><div class="tile"><b id="rcKnown">0</b><span>已背</span></div></div>
       <button class="big" id="rcStart">開始背誦</button>
       <p class="note" id="rcStartNote" style="text-align:center;margin:-2px 0 4px"></p>
-      <button class="big alt" id="rcMore" style="display:none">再多背一段</button>
+      <button class="big alt" id="rcMore" style="display:none">再多背一張</button>
       <div class="rc-set">
-        <div class="row" style="margin-top:6px"><label style="width:auto">段落大小</label><div class="seg rcSizeSeg" id="rcSize"><button data-v="tight">緊</button><button data-v="std">標準</button><button data-v="loose">鬆</button></div></div>
+        <div class="row" style="margin-top:6px"><label style="width:auto">每張小卡</label><div class="seg rcSizeSeg" id="rcSize"><button data-v="tight">短</button><button data-v="std">中</button><button data-v="loose">長</button></div></div>
         <p class="note" id="rcSizeNote" style="margin:4px 0 10px"></p>
-        <div class="rc-pick"><select class="sel" id="rcSel" aria-label="選擇段落"></select><button class="big" id="rcGo">背這段</button></div>
-        <p class="note" style="margin:4px 0 0">下拉選單顯示每段開頭幾個字；也可以在下面的進度條上點一下或左右滑動選段，再按「背這段」。</p>
+        <div class="rc-pick"><select class="sel" id="rcSel" aria-label="選擇小卡"></select><button class="big" id="rcGo">背這張</button></div>
+        <p class="note" style="margin:4px 0 0">下拉選單顯示每張小卡開頭幾個字（括號是出自經文第幾段）；也可以在下面的進度條上點一下或左右滑動選卡，再按「背這張」。</p>
       </div>
       <div class="rcbar" id="rcMap"></div><div class="rcends"><span>如是我聞</span><span>作禮而去</span></div>
       <p class="note" id="rcSelNote" style="text-align:center;margin:4px 0 0"></p>
@@ -728,8 +732,8 @@ const bumpF=u=>u<.3?1-Math.pow(1-u/.3,2):1-(()=>{const k=(u-.3)/.7;return k*k*(3
 let particles=[];
 function spawn(){
   const f=pt(Math.PI/2);
-  for(let i=0;i<7;i++)particles.push({x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*8,vx:(Math.random()-.5)*.5,vy:-.35-Math.random()*.7,life:0,max:700+Math.random()*500,r:2+Math.random()*3});
-  particles.push({x:f.x,y:f.y,ring:1,life:0,max:520,r:6});
+  for(let i=0;i<3;i++)particles.push({x:f.x+(Math.random()-.5)*12,y:f.y+(Math.random()-.5)*6,vx:(Math.random()-.5)*.2,vy:-.18-Math.random()*.25,life:0,max:900+Math.random()*400,r:1.6+Math.random()*1.6});
+  particles.push({x:f.x,y:f.y,ring:1,life:0,max:900,r:6});
 }
 let pos=S.total,vel=0,thumbU=1,raf=0,last=0;
 function draw(){
@@ -764,8 +768,8 @@ function draw(){
   // 微光粒子
   for(const p of particles){
     const k=p.life/p.max;if(k>=1)continue;
-    if(p.ring){ctx.strokeStyle=`rgba(255,205,110,${.55*(1-k)})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X(p.x),p.y,p.r+k*SP*2.2,0,7);ctx.stroke();continue}
-    const g=ctx.createRadialGradient(X(p.x),p.y,0,X(p.x),p.y,p.r*2.2);g.addColorStop(0,`rgba(255,226,150,${.9*(1-k)})`);g.addColorStop(1,'rgba(255,226,150,0)');
+    if(p.ring){ctx.strokeStyle=`rgba(230,185,105,${.32*(1-k)*(1-k)})`;ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(X(p.x),p.y,p.r+k*SP*1.1,0,7);ctx.stroke();continue}
+    const g=ctx.createRadialGradient(X(p.x),p.y,0,X(p.x),p.y,p.r*2.2);g.addColorStop(0,`rgba(255,226,150,${.55*(1-k)})`);g.addColorStop(1,'rgba(255,226,150,0)');
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(X(p.x),p.y,p.r*2.2,0,7);ctx.fill();
   }
   // 手：底層＋會動的拇指
@@ -787,7 +791,7 @@ function draw(){
 function loop(t){
   const dtms=Math.min(50,t-(last||t)),dt=Math.min(3,dtms/16.7);last=t;
   const target=S.total;
-  vel+=(target-pos)*.17*dt;vel*=Math.pow(.74,dt);pos+=vel*dt;
+  vel+=(target-pos)*.15*dt;vel*=Math.pow(.47,dt);pos+=vel*dt;
   if(thumbU<1)thumbU=Math.min(1,thumbU+dtms/380);
   particles.forEach(p=>{p.life+=dtms;if(!p.ring){p.x+=p.vx*dtms*.06;p.y+=p.vy*dtms*.06}});
   particles=particles.filter(p=>p.life<p.max);
@@ -875,17 +879,16 @@ const SY={"2": {"t": "為什麼要有極樂世界？", "pts": ["釋迦牟尼佛�
 let rdI=store.get('rdI',0),rdFs=store.get('rdFs',1),rdPg=store.get('rdPg','std');
 const PGL={tight:'緊',std:'標準',loose:'鬆'};if(!PGL[rdPg])rdPg='std';
 const escH=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-function fmtPg(t){
-  let ls=String(t).split('\n').map(x=>x.trim()).filter(Boolean);
-  if(rdPg==='tight')ls=[ls.join('')];
-  if(rdPg==='loose'){const o=[];ls.forEach(l=>l.replace(/([。！？；])/g,'$1\n').split('\n').forEach(x=>{x=x.trim();if(x)o.push(x)}));ls=o}
-  return ls.map(x=>'<p>'+escH(x)+'</p>').join('');
-}
+// 分段（全工具同一套）：緊＝連成一段；標準＝每句（。！？）換行；鬆＝每個停頓（。！？；：）換行並留空
+function pgSplit(t){const s=String(t).replace(/\s*\n\s*/g,'');if(rdPg==='tight')return [s];
+  const re=rdPg==='loose'?/([。！？；：][」』]?)/g:/([。！？][」』]?)/g;
+  return s.replace(re,'$1\n').split('\n').map(x=>x.trim()).filter(Boolean)}
+function fmtPg(t){return pgSplit(t).map(x=>'<p>'+escH(x)+'</p>').join('')}
 function setRdPg(v){if(!PGL[v])return;rdPg=v;store.set('rdPg',v);syncRdPg();renderRead(true);if(typeof toast==='function'&&window._pgToast)toast('分段：'+PGL[v])}
-function pgText(h){h=String(h);
-  if(rdPg==='tight')return h.replace(/\n+/g,'');
-  if(rdPg==='loose')return h.replace(/([。！？；：])\n*/g,'$1\n\n').replace(/\n+$/,'');
-  return h.replace(/([。！？])(?!\n)/g,'$1\n').replace(/\n+$/,'');}
+function pgText(h){h=String(h).replace(/\s*\n\s*/g,'');
+  if(rdPg==='tight')return h;
+  if(rdPg==='loose')return h.replace(/([。！？；：][」』]?)/g,'$1\n\n').replace(/\n+$/,'');
+  return h.replace(/([。！？][」』]?)/g,'$1\n').replace(/\n+$/,'');}
 function syncRdPg(){const vr=document.documentElement;vr.classList.remove('pg-tight','pg-std','pg-loose');vr.classList.add('pg-'+rdPg);
   $('#rdPgB').textContent='分段 '+PGL[rdPg];if(window.onPgChange)window.onPgChange();document.querySelectorAll('.rdPgSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===rdPg))}
 function renderRead(keep){
@@ -924,7 +927,7 @@ const recd=store.get('recd',{}),recU=store.get('recU',{}),cards=store.get('cards
 let recAll=store.get('recAll',0);
 const saveRec=()=>{store.set('recd',recd);store.set('recU',recU);store.set('cards2',cards);store.set('newd2',newd)};
 const PUNRE=/[，。；：！？、「」『』（）\s—]/g,cnt=x=>x.replace(PUNRE,'').length;
-const RCM={tight:{pre:'t',mx:60,mg:50,fl:45,br:65,bm:20,mn:25,label:'緊',per:'約 50 字'},std:{pre:'p',mx:130,mg:115,fl:85,br:130,bm:25,mn:45,label:'標準',per:'約 100 字'},loose:{pre:'l',mx:130,mg:115,fl:170,br:230,bm:60,mn:90,label:'鬆',per:'約 200 字'}};
+const RCM={tight:{pre:'t',mx:60,mg:50,fl:45,br:65,bm:20,mn:25,label:'短',per:'約 50 字'},std:{pre:'p',mx:130,mg:115,fl:85,br:130,bm:25,mn:45,label:'中',per:'約 100 字'},loose:{pre:'l',mx:130,mg:115,fl:170,br:230,bm:60,mn:90,label:'長',per:'約 200 字'}};
 let rcMode=store.get('rcMode','std');if(!RCM[rcMode])rcMode='std';
 const CARDS=[];
 function buildCards(){
@@ -953,20 +956,21 @@ function maskText(text,stage){
 const dueList=()=>{const now=Date.now();return CARDS.filter(c=>cards[c.id]&&cards[c.id].due<=now)};
 const newToday=()=>newd[dstr()]||0;
 const nextNew=()=>CARDS.find(c=>!cards[c.id]);
-const cLabel=c=>`第 ${c.k} 段／共 ${CARDS.length} 段・約 ${c.n} 字`;
+const uRange=c=>'經文第 '+(c.u+1)+(c.u2!==c.u?'–'+(c.u2+1):'')+' 段';
+const cLabel=c=>`第 ${c.k} 張／共 ${CARDS.length} 張`,cSub=c=>`<small class="tis">${uRange(c)}・約 ${c.n} 字</small>`;
 function renderRec(){
   ttsStop();
   $('#v-rec').classList.remove('fullmode');$('#rc-full').style.display='none';
   $('#rc-home').style.display='';$('#rc-card').style.display='none';
   const d=dueList().length,nn=nextNew(),canNew=nn&&newToday()<1,learned=CARDS.filter(c=>cards[c.id]).length;
-  $('#rcIntro').textContent=`每天背 1 段（${RCM[rcMode].per}）：先念三遍，再憑記憶背出來，然後按「記得／模糊／忘了」，系統安排什麼時候再複習。整部經 ${TOTAL_CH.toLocaleString()} 字，分成 ${CARDS.length} 段，約 ${CARDS.length} 天背完。`;
+  $('#rcIntro').textContent=`每天背 1 張小卡（${RCM[rcMode].per}）：先念三遍，再憑記憶背出來，然後按「記得／模糊／忘了」，系統安排什麼時候再複習。整部經 ${TOTAL_CH.toLocaleString()} 字，分成 ${CARDS.length} 張，約 ${CARDS.length} 天背完。`;
   $('#rcDue').textContent=d;$('#rcNew').textContent=newToday()+'/1';$('#rcKnown').textContent=learned+'/'+CARDS.length;
   const st=$('#rcStart'),more=$('#rcMore');
-  if(d+(canNew?1:0)>0){st.disabled=false;st.textContent='開始今天的背誦';$('#rcStartNote').textContent=[canNew?`新 1 段（約 ${nn.n} 字）`:'',d?`複習 ${d} 段`:''].filter(Boolean).join('、')}else{st.disabled=true;st.textContent=nn?'今天的份量完成了':'整部經都背過了';$('#rcStartNote').textContent=''}
+  if(d+(canNew?1:0)>0){st.disabled=false;st.textContent='開始今天的背誦';$('#rcStartNote').textContent=[canNew?`新 1 張（約 ${nn.n} 字）`:'',d?`複習 ${d} 張`:''].filter(Boolean).join('、')}else{st.disabled=true;st.textContent=nn?'今天的份量完成了':'整部經都背過了';$('#rcStartNote').textContent=''}
   more.style.display=(!canNew&&nn)?'':'none';
   $('#rcMap').innerHTML='<div class="tr">'+CARDS.map(c=>{const o=cards[c.id];return `<i style="flex:${c.n} 1 0" class="${o?(o.s>=5?'kn':'ln'):''}"></i>`}).join('')+'</div><b class="hd"></b>';
   const nx=Object.values(cards).map(c=>c.due).filter(t=>t>Date.now()).sort((a,b)=>a-b)[0];
-  $('#rcNote').textContent=nx&&!d?'下一段要複習的時間：'+new Date(nx).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+'。':'整條是整部經：淡色＝還沒背，金色＝背誦中，橘色＝已熟（連續記得 5 次）。';
+  $('#rcNote').textContent=nx&&!d?'下一張要複習的時間：'+new Date(nx).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+'。':'整條是整部經：淡色＝還沒背，金色＝背誦中，橘色＝已熟（連續記得 5 次）。';
   $('#fullImg').src=imgSrc(9);const fu=store.get('fullU',0);$('#fullSub').textContent=fu?`上次停在第 ${fu+1} 段，點一下接著誦`:`15 段，一句一句誦完${recAll?'（已誦完 '+recAll+' 次）':''}`;
   $('#fullGo').onclick=()=>startFull();
   rcPickUI();
@@ -982,9 +986,10 @@ function nextCard(){
 function drawLearn(){
   ttsStop();
   const c=curCard,el=$('#rc-card');$('#rc-home').style.display='none';el.style.display='';
-  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　新段・先念三遍</div><div class="tx">${pgText(c.text)}</div></div><div class="lr">跟著念，念完一遍按一下（${learnN}／3）</div>${ttsBar()}
+  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　新卡・先念三遍${cSub(c)}</div><div class="tx">${pgText(c.text)}</div></div><div style="text-align:right;margin:-4px 2px 4px"><button class="pill pgBtn">分段 ${PGL[rdPg]}</button></div><div class="lr">跟著念，念完一遍按一下（${learnN}／3）</div>${ttsBar()}
    <button class="big" id="lr">${learnN>=3?'開始背':'念完一遍'}</button><button class="big alt" id="rcBack" style="margin-top:6px">先到這裡</button>`;
   ttsBind(el,()=>c.text);
+  el.querySelectorAll('.pgBtn').forEach(b=>b.onclick=()=>{setRdPg({tight:'std',std:'loose',loose:'tight'}[rdPg]);drawLearn()});
   $('#lr').onclick=()=>{if(learnN>=3){curCard={...c,learn:0};drawCard()}else{learnN++;drawLearn()}};
   $('#rcBack').onclick=renderRec;
 }
@@ -992,7 +997,7 @@ function drawCard(){
   ttsStop();
   const c=curCard,st=(cards[c.id]||{s:0}).s;
   $('#rc-home').style.display='none';const el=$('#rc-card');el.style.display='';
-  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　${cards[c.id]?'複習':'新段'}</div><div class="tx" id="cx">${pgText(revealed?c.text:maskText(c.text,st))}</div></div><div style="text-align:right;margin:-4px 2px 4px"><button class="pill pgBtn">分段 ${PGL[rdPg]}</button></div>`+
+  el.innerHTML=`<div class="mcard"><div class="ti">${cLabel(c)}　${cards[c.id]?'複習':'新卡'}${cSub(c)}</div><div class="tx" id="cx">${pgText(revealed?c.text:maskText(c.text,st))}</div></div><div style="text-align:right;margin:-4px 2px 4px"><button class="pill pgBtn">分段 ${PGL[rdPg]}</button></div>`+
    (revealed?`${ttsBar()}<div class="rate"><button class="f" data-r="f">忘了</button><button class="m" data-r="m">模糊</button><button class="g" data-r="g">記得</button></div>`:`<button class="big" id="rv">看答案</button>`)+
    `<button class="big alt" id="rcBack" style="margin-top:14px">先到這裡</button><p class="note">先試著念出來，再看答案。誠實按就好，沒有分數。</p>`;
   el.querySelectorAll('.pgBtn').forEach(b=>b.onclick=()=>{setRdPg({tight:'std',std:'loose',loose:'tight'}[rdPg]);drawCard()});
@@ -1005,7 +1010,7 @@ function rate(r){
   const c=curCard;let o=cards[c.id];if(!o){o={s:0,due:0};newd[dstr()]=newToday()+1}
   if(r==='g')o.s=Math.min(8,o.s+1);else if(r==='f')o.s=0;
   o.due=Date.now()+INT[r==='m'?Math.max(0,o.s-1):o.s];cards[c.id]=o;saveRec();
-  if(r!=='g'){queue.push({...c,learn:0});if(typeof toast==='function')toast(queue.length>1?'這段等一下會再出現，繼續背':'再背一次這段')}
+  if(r!=='g'){queue.push({...c,learn:0});if(typeof toast==='function')toast(queue.length>1?'這張等一下會再出現，繼續背':'再背一次這張')}
   nextCard();
 }
 
@@ -1015,20 +1020,20 @@ const head=(t,n=8)=>t.replace(/\s+/g,'').replace(PUNRE,'').slice(0,n)+'…';
 function rcPickUI(){
   syncRcSeg();
   const sel=$('#rcSel'),keep=sel.value;
-  sel.innerHTML=CARDS.map(c=>{const o=cards[c.id];return `<option value="${c.id}">第 ${c.k} 段・${head(c.text)}${o?(o.s>=5?'　✓已熟':'　●背誦中'):''}</option>`}).join('');
+  sel.innerHTML=CARDS.map(c=>{const o=cards[c.id];return `<option value="${c.id}">第 ${c.k} 張・${head(c.text)}（第 ${c.u+1} 段）${o?(o.s>=5?'　✓已熟':'　●背誦中'):''}</option>`}).join('');
   if(keep&&CARDS.some(c=>c.id===keep))sel.value=keep;else{const nn=nextNew();sel.value=(nn||CARDS[0]).id}
-  const M=RCM[rcMode];$('#rcSizeNote').textContent=`${M.label}：每段${M.per}，共 ${CARDS.length} 段。三種大小各自記錄進度，隨時可以換。`;
+  const M=RCM[rcMode];$('#rcSizeNote').textContent=`${M.label}：每張${M.per}，共 ${CARDS.length} 張。三種各自記錄進度，隨時可以換。`;
   const mp=[...document.querySelectorAll('#rcMap i')],bar=$('#rcMap');
   const mark=()=>{const c=CARDS.find(x=>x.id===sel.value);
     const hd=bar.querySelector('.hd');if(hd&&c){let a=0;for(const x of CARDS){if(x===c)break;a+=x.n}hd.style.left=((a+c.n/2)/TOTAL_CH*100)+'%'}
-    if(c){const o=cards[c.id];$('#rcSelNote').textContent=`第 ${c.k} 段・${head(c.text)}・約 ${c.n} 字・${o?(o.s>=5?'已熟':'背誦中'):'還沒背'}`}};
+    if(c){const o=cards[c.id];$('#rcSelNote').textContent=`第 ${c.k} 張・${head(c.text)}・約 ${c.n} 字・${uRange(c)}・${o?(o.s>=5?'已熟':'背誦中'):'還沒背'}`}};
   const idxAt=x=>{const r=bar.getBoundingClientRect(),f=Math.max(0,Math.min(1,(x-r.left)/r.width))*TOTAL_CH;let a=0;for(let i=0;i<CARDS.length;i++){a+=CARDS[i].n;if(f<=a)return i}return CARDS.length-1};
   const pick=x=>{sel.value=CARDS[idxAt(x)].id;mark()};
   bar.onpointerdown=e=>{try{bar.setPointerCapture(e.pointerId)}catch(_){}pick(e.clientX)};
   bar.onpointermove=e=>{if(e.buttons||e.pressure>0)pick(e.clientX)};
   sel.onchange=mark;mark();
 }
-function syncRcSeg(){document.querySelectorAll('.rcSizeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===rcMode));const n=$('#stRcNote'),M=RCM[rcMode];if(n)n.textContent=`${M.label}：每段${M.per}，共 ${CARDS.length} 段。三種大小各自記錄進度，隨時可以換。`}
+function syncRcSeg(){document.querySelectorAll('.rcSizeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===rcMode));const n=$('#stRcNote'),M=RCM[rcMode];if(n)n.textContent=`${M.label}：每張${M.per}，共 ${CARDS.length} 張。三種各自記錄進度，隨時可以換。`}
 function pickGo(){
   const c=CARDS.find(x=>x.id===$('#rcSel').value);if(!c)return;
   queue=[];revealed=false;learnN=0;curCard=cards[c.id]?{...c}:{...c,learn:1};curCard.learn?drawLearn():drawCard();
@@ -1133,7 +1138,7 @@ function startFull(from){
       <div class="fl-art"><img src="${imgSrc(ui)}" alt=""></div>
       <div class="fl-t">${ui+1}．${u.title}</div>
       <div class="fl-orn"><i></i>${LOTUS_SVG}<i></i></div>
-      <div class="fl-body" id="flb"><div class="follow">${ph.map(x=>`<span>${x}</span>`+(rdPg==='tight'?'':(rdPg==='loose'?(/[。！？；：]$/.test(x)?'<br><i class="pgap"></i>':''):(/[。！？]$/.test(x)?'<br>':'')))).join('')}</div></div>
+      <div class="fl-body" id="flb"><div class="follow">${ph.map(x=>`<span>${x}</span>`+(rdPg==='tight'?'':(rdPg==='loose'?(/[。！？；：][」』]?$/.test(x)?'<br><i class="pgap"></i>':''):(/[。！？][」』]?$/.test(x)?'<br>':'')))).join('')}</div></div>
       <div class="fl-bar"><button class="big alt" id="flBack">${ui?'‹ 上一段':'返回'}</button><button class="big" id="flNext"></button></div>`;
     sp=[...el.querySelectorAll('.follow span')];
     el.querySelectorAll('#flp i').forEach(d=>d.onclick=()=>{ui=+d.dataset.i;build()});
