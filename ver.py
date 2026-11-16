@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""每次推出前執行：python3 ver.py <big|minor|micro> "這一版改了什麼（寫使用者看得懂的用法）"
+"""每次推出前先跑 python3 check.py（語法檢查），再執行：python3 ver.py <big|minor|micro> "這一版改了什麼（寫使用者看得懂的用法）"
 版號 V-4.903：4 大修（整體架構）、9 小修、03 微調（文字等）。
 會改 index.html 的 APPV，並在版本記錄 CHG 最前面加一筆（含日期與時間）。"""
 import re,sys,json,datetime
