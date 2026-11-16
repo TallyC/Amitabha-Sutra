@@ -320,6 +320,13 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
 
 .dpsel{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:calc(16px*var(--ui,1));background:var(--glass);color:var(--ink);margin-top:6px}
 .dpcard{background:rgba(255,250,244,.92);border:1px solid #e6d3bd;border-radius:14px;padding:10px 14px;margin:8px 0;font-size:calc(15.5px*var(--ui,1));line-height:1.8}
+.bkbox .big{margin:8px 0 0}.bkbox textarea,.sxytx{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.7);padding:10px;font-size:calc(15px*var(--ui,1));font-family:inherit;color:var(--ink,#4a3b32);margin-top:8px;resize:vertical}
+.bkbox details{margin-top:10px}.bkbox summary{color:var(--soft);font-size:calc(15px*var(--ui,1))}
+.sxyrow{display:flex;gap:8px;margin:8px 0}.sxyb{flex:1;border:1.5px solid var(--line);border-radius:14px;background:var(--glass);padding:10px 4px;color:var(--soft);display:flex;flex-direction:column;align-items:center;gap:4px}
+.sxyb b{font-size:calc(24px*var(--ui,1));font-weight:500;color:var(--accent)}.sxyb small{font-size:calc(12.5px*var(--ui,1));line-height:1.5}
+.sxyb.on{background:rgba(213,138,111,.16);border-color:var(--accent);color:var(--ink,#4a3b32)}
+.sxyh{display:flex;gap:6px;justify-content:space-between;margin-top:10px}.sxyh div{flex:1;text-align:center;font-size:calc(12px*var(--ui,1));color:var(--soft)}
+.sxyh i{display:inline-block;width:7px;height:7px;border-radius:50%;border:1px solid var(--accent);margin:1px}.sxyh i.on{background:var(--accent)}
 .dpcard b{display:block;font-weight:500;color:var(--accent);letter-spacing:.1em}
 .dpcard span{color:var(--soft)}
 .dpsrc{display:block;margin-top:8px;font-size:calc(13px*var(--ui,1));line-height:1.7;color:#9a7d6a}.dpsrc a{display:inline-block;margin-top:4px;color:var(--accent);text-decoration:none;border:1px solid rgba(201,112,90,.4);border-radius:999px;padding:3px 12px}
@@ -422,6 +429,18 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <div class="setbox"><b>背誦小卡的字數</b><div class="seg rcSizeSeg"><button data-v="tight">短</button><button data-v="std">中</button><button data-v="loose">長</button><button data-v="custom">自訂</button></div><div class="rcCus"><button class="pill" data-d="-10" aria-label="少 10 字">－</button><b class="rcNv">80 字</b><button class="pill" data-d="10" aria-label="多 10 字">＋</button></div><p class="note" id="stRcNote"></p></div>
     <div class="setbox"><b>語音報讀</b><button class="big alt" id="stTp" style="margin-top:8px">語音與唸法設定</button></div>
     <div class="setbox"><b>開啟時的提醒</b><div class="seg remindSeg"><button data-v="1">顯示</button><button data-v="0">不顯示</button></div><p class="note">還沒加到手機桌面時，打開會先顯示工具聲明與安裝提醒。</p></div>
+    <div class="setbox bkbox"><b>帶走・接回進度</b>
+      <p class="note">念佛聲數、背誦進度、設定都只存在這支手機。換手機或清除資料前，先按「存成備份檔」；到新手機打開本工具，按「接回備份檔」選那個檔就好。不需要寄信。</p>
+      <button class="big" id="bkSave">存成備份檔</button>
+      <button class="big alt" id="bkLoad">接回備份檔</button>
+      <input type="file" id="bkFile" accept=".json,application/json,text/plain" hidden>
+      <p class="note" id="bkNote"></p>
+      <details><summary>備份檔打不開時，改用文字備份</summary>
+        <button class="big alt" id="bkCopy">複製備份碼（再貼到記事本或 LINE 傳給自己）</button>
+        <textarea id="bkCode" rows="3" placeholder="要接回時，把備份碼貼在這裡"></textarea>
+        <button class="big alt" id="bkPaste">用貼上的備份碼接回</button>
+      </details>
+    </div>
     <button class="big alt" id="stHelp">使用說明・安裝・聲明</button>
     <button class="pill" id="stReset" style="align-self:center;margin:6px 0">還原預設設定</button>
     <p class="sign">製作：Tally.C</p>
@@ -477,7 +496,11 @@ details.plan{margin:14px 0}details.plan summary{font-size:calc(16px*var(--ui,1))
     <details class="plan" open id="dpD1"><summary>① 這一段，大家怎麼說</summary>
       <div class="dpcards" id="dpCards"></div></details>
     <details class="plan"><summary>② 兩個譯本並排</summary><p class="note dppend">準備中：羅什本與玄奘《稱讚淨土佛攝受經》同段對看，逐字核對後開放。</p></details>
-    <details class="plan"><summary>③ 信願行小記錄</summary><p class="note dppend">準備中：只自我記錄，不計分、不比較。</p></details>
+    <details class="plan" id="dpSxy"><summary>③ 信願行小記錄</summary>
+      <p class="note">淨土法門常說「信、願、行」。這裡只給自己看：今天想到哪一個，就點亮哪一個。不計分、不比較，沒點也沒關係。</p>
+      <div class="sxyrow" id="sxyRow"><button class="sxyb" data-k="x"><b>信</b><small>相信極樂世界與阿彌陀佛真實不虛</small></button><button class="sxyb" data-k="y"><b>願</b><small>發願往生極樂世界</small></button><button class="sxyb" data-k="z"><b>行</b><small>今天念佛或誦經</small></button></div>
+      <textarea class="sxytx" id="sxyTx" rows="2" maxlength="120" placeholder="今天的一句話（選填，只存在這支手機）"></textarea>
+      <div class="sxyh" id="sxyH"></div></details>
     <details class="plan" hidden><summary>⑤ 一心不亂是什麼</summary><p class="note dppend">準備中：整理蓮池大師「事一心、理一心」的白話說明。</p></details>
     <details class="plan" hidden><summary>⑥ 六方諸佛地圖</summary><p class="note dppend">準備中：可點的互動圖。</p></details>
     <details class="plan" hidden><summary>⑦ 梵漢小對照</summary><p class="note dppend">準備中：只放對過梵本的少數名詞。</p></details>
@@ -1328,6 +1351,49 @@ $('#stTp').onclick=()=>openTp();
 $('#stHelp').onclick=()=>goTab('help');
 let rsArm=false;$('#stReset').onclick=()=>{const b=$('#stReset');if(!rsArm){rsArm=true;b.textContent='再按一次確認還原';setTimeout(()=>{rsArm=false;b.textContent='還原預設設定'},4000);return}
   rsArm=false;b.textContent='還原預設設定';applyUi(1);applyLh(1);store.set('noRemind',0);rcMode='std';store.set('rcMode','std');buildCards();renderRec();syncSettings();toast('已還原預設設定（背誦與念佛紀錄不受影響）')};
+
+/* ---------- ③ 信願行小記錄 ---------- */
+let sxy=store.get('sxy',{});
+function sxyRender(){const t=sxy[dstr()]||{};
+  document.querySelectorAll('#sxyRow .sxyb').forEach(b=>b.classList.toggle('on',!!t[b.dataset.k]));
+  const tx=$('#sxyTx');if(tx&&document.activeElement!==tx)tx.value=t.n||'';
+  let h='';for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const r=sxy[dstr(d)]||{};
+    h+=`<div>${d.getMonth()+1}/${d.getDate()}<br>${['x','y','z'].map(k=>`<i class='${r[k]?'on':''}'></i>`).join('')}</div>`}
+  $('#sxyH').innerHTML=h}
+document.querySelectorAll('#sxyRow .sxyb').forEach(b=>b.onclick=()=>{const k=dstr(),t=sxy[k]=sxy[k]||{};if(t[b.dataset.k])delete t[b.dataset.k];else t[b.dataset.k]=1;store.set('sxy',sxy);sxyRender()});
+$('#sxyTx').oninput=e=>{const k=dstr(),t=sxy[k]=sxy[k]||{};t.n=e.target.value.slice(0,120);store.set('sxy',sxy);sxyRender()};
+sxyRender();
+
+/* ---------- 帶走／接回進度 ---------- */
+const BK_TAG='amt-amitabha-backup';
+function bkCollect(){const d={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('amt_')===0)d[k]=localStorage.getItem(k)}}catch(e){}
+  return {app:BK_TAG,ver:APPV,time:new Date().toISOString(),data:d}}
+function bkSummary(o){let t=0;try{t=JSON.parse(o.data.amt_total||'0')||0}catch(e){}return `累計念佛 ${Number(t).toLocaleString()} 聲`}
+function bkNoteUpdate(){const l=store.get('lastBk',null);$('#bkNote').textContent=l?'上次備份：'+l:'還沒備份過。'}
+bkNoteUpdate();
+function bkStamp(){const n=new Date();store.set('lastBk',n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'))}
+$('#bkSave').onclick=()=>{bkStamp();const o=bkCollect(),txt=JSON.stringify(o);
+  try{const b=new Blob([txt],{type:'application/json'}),a=document.createElement('a'),n=new Date();
+    a.href=URL.createObjectURL(b);a.download='阿彌陀經備份-'+n.getFullYear()+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'.json';
+    document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+    toast('已存成備份檔（'+bkSummary(o)+'）。若沒看到檔案，請改用下方的文字備份。')}catch(e){toast('這個瀏覽器不能直接存檔，請改用下方的文字備份。')}
+  bkNoteUpdate()};
+$('#bkCopy').onclick=async()=>{bkStamp();const o=bkCollect(),code='AMT1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+  try{await navigator.clipboard.writeText(code);toast('備份碼已複製，請貼到記事本或 LINE 傳給自己保存。')}catch(e){$('#bkCode').value=code;$('#bkCode').select();toast('請長按選取文字框裡的備份碼，自行複製。')}
+  bkNoteUpdate()};
+let bkArm=null,bkArmT=0;
+function bkRestore(txt,btn,label){let o;
+  try{txt=txt.trim();if(txt.indexOf('AMT1:')===0)txt=decodeURIComponent(escape(atob(txt.slice(5))));o=JSON.parse(txt)}catch(e){toast('這不是有效的備份，沒有任何變動。');return}
+  if(!o||o.app!==BK_TAG||!o.data||typeof o.data!=='object'){toast('這不是阿彌陀經工具的備份，沒有任何變動。');return}
+  if(bkArm!==txt){bkArm=txt;btn.textContent='再按一次：用備份（'+bkSummary(o)+'）取代這支手機的進度';clearTimeout(bkArmT);bkArmT=setTimeout(()=>{bkArm=null;btn.textContent=label},8000);return}
+  try{const del=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('amt_')===0)del.push(k)}
+    del.forEach(k=>localStorage.removeItem(k));Object.keys(o.data).forEach(k=>{if(k.indexOf('amt_')===0&&typeof o.data[k]==='string')localStorage.setItem(k,o.data[k])});
+    toast('已接回進度，重新載入中…');setTimeout(()=>location.reload(),900)}catch(e){toast('接回時發生問題，請再試一次。')}}
+let bkPend=null;
+$('#bkLoad').onclick=()=>{if(bkPend){const t=bkPend;bkRestore(t,$('#bkLoad'),'接回備份檔');return}$('#bkFile').value='';$('#bkFile').click()};
+$('#bkFile').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{bkPend=String(r.result);bkArm=null;bkRestore(bkPend,$('#bkLoad'),'接回備份檔');if(bkArm===null)bkPend=null;else setTimeout(()=>{bkPend=null},8000)};r.readAsText(f)};
+$('#bkPaste').onclick=()=>{bkRestore($('#bkCode').value,$('#bkPaste'),'用貼上的備份碼接回')};
 /* ---------- 開啟提醒（聲明＋安裝，可關閉） ---------- */
 const isInstalled=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true}catch(e){return false}};
 function showWelcome(){
@@ -1476,8 +1542,8 @@ function dpFill(){const sel=$('#dpSel');if(!sel.options.length)UNITS.forEach((u,
 const DEEPOY={"1": "蕅益說「如是」是實相妙理古今不變，依這個理念佛求生，決定沒有錯；「我聞」是阿難親聞，不離假名；「一時」是師徒道合、說聽圓滿的那一會。聽眾次序是聲聞、菩薩、天人：聲聞是出世相、常隨佛、佛法靠僧傳；他說這些大弟子本是法身大士，示現聲聞，同聞淨土法門。連深位菩薩也求生淨土，因為不離見佛、聞法、親近供養僧，才能快速圓滿菩提。", "2": "別序是佛見因緣成熟，不等人問、自己開口。淨土法門甚深，沒有人能問，所以佛特別對智慧第一的舍利弗說。有人問為什麼極樂在西方？蕅益答：這不是好問題，從娑婆看在西，從十一萬億佛土之外看，極樂反在東。他又分三層：有世界（勸信）、名極樂（勸願）、佛號阿彌陀（勸持名）。", "3": "蕅益用三苦來解釋「極樂」：娑婆的苦是苦苦、壞苦（樂會壞）、行苦（不苦不樂也在遷流）。極樂永離這三種苦，不是對著苦才說樂的樂。他又說同居、方便、實報、寂光四種淨土，各有各的樂，這裡主要指同居淨土，同時也包含上面三土。", "4": "七寶池、八功德水、金沙、階道、樓閣，蕅益逐項對照，說它們都不同於此方的土石、污泥、枯竭與氾濫。蓮花大如車輪，是舉最小的來說；四色蓮花各放其光，是淨業所感，不同此方有色無光。結語說，這些都是阿彌陀佛大願大行所成就的功德。", "5": "天樂不斷，所以說「常作天樂」。「晝夜六時」他說是順著此方習慣的假說，極樂其實沒有昏夜。清晨供養他方十萬億佛，意思是往生後想回來供養釋迦、彌勒也不難；「即以食時還到本國」，是神足自在。念食食至、食畢缽去，只剩經行寶地、任運進修。", "6": "鳥說的是三十七道品。他逐項列了五根、五力、七覺分、八正道的內容。經說鳥不是罪報所生，蕅益用四悉檀解釋為什麼要化成鳥：順著凡情、鳥尚說法令人生善、不起下劣想、鳥即彌陀所化。風吹寶樹寶網出妙音，是無情說法；有情與無情同宣妙法，都是佛願力所成，也是淨業所感。", "7": "他說心性寂而常照是光明，照而常寂是壽命，彌陀徹證心性無量之體，所以光明、壽命無量。法身壽命無始無終，報身有始無終，皆可稱無量；「無量光」「無量壽」是彌陀因地發四十八願的別名。成佛十劫，他說時劫無性，三世當體全空，但差別宛然，都是現前一念所現。", "8": "聲聞：定性二乘不生極樂；但先習小乘、臨終迴向發願的人可以生，生後旋即向大。阿鞞跋致是不退，有位、行、念三種；極樂眾生一生補處很多。「應當發願」是往生要領：信願堅固，臨終十念一念也得生；若沒有信願，只把名號當話頭、持到風吹不入，也萬無往生的道理。", "9": "蕅益說，善根是菩提正道（親因），福德是布施持戒禪等助道（助緣）；聲聞獨覺的菩提叫少善根，人天有漏福業叫少福德，這些都不能生淨土。以信願執持名號，則一一聲中都有多善根福德，即使散心稱名，所積也不可量。", "10": "他把聞、思、修對上去：聞說彌陀是聞慧，執持名號是思慧，一心不亂是修慧。又分事持（信西方佛、如子憶母）與理持（信佛是自心所具所造）。一日到七日，是利鈍根不同。事一心不為見思所亂，生同居、方便土；理一心不為二邊所亂，生實報、寂光土。他說七日是約平時工夫；沒有平時，哪有臨終十念。散心稱名必除罪、不一定往生，但一稱佛名已是成佛種子。", "11": "蕅益說不可思議有五層：橫超三界、橫具四土、持名簡易、一七為期、念一佛等於為諸佛護念。廣長舌相表示言必誠實。為什麼六方都有佛，卻單讚西方？他說：讓初機容易繫心、彌陀願勝、與此土眾生有緣，念彌陀一佛即念無量佛。他說經的完整名稱是《稱讚不可思議功德一切諸佛所護念經》，羅什、玄奘的譯名只是詳略不同。", "12": "聞經、受持，以及聞佛名者，都被諸佛護念。蕅益分兩層：局指須聞此經、受持持名之法，持到一心不亂，才是真「聞」；通指佛名功德不可思議，一聞佛名，有心無心、信或謗，都成緣種，如入栴檀林染香氣。他說憑他力，相似位就蒙護念，也能得三種不退。", "13": "已發願、今發願、當發願，各對應已生、今生、當生，願無虛發。他說「願者信之券」，是行的樞紐；舉願，信與行就在其中了。「今發願」有兩義：一是此生發願持名，臨終必生；二是約剎那，一念相應即一念生，只今信願持名，便不是娑婆界內人。", "14": "蕅益說，在淨土成佛容易、在濁世成佛難；為濁世眾生說漸法容易、說頓法難；說淨土橫超法門、只持名就能登不退，更是難中之難。五濁他也逐項說：劫濁是濁法聚會之時，見濁是五利使，煩惱濁是五鈍使，眾生濁是粗弊五陰和合，命濁是壽命短促。", "15": "他說這個法門甚深難信，沒人能問，所以佛無問自說。大眾聽了如時雨化，所以歡喜信受：身心怡悅是歡喜，毫無疑惑是信，領持不忘是受，投身歸命是作禮，依教修行不退是「去」。跋語裡他自述：早年自負宗乘、藐視持名，大病後研究諸疏鈔，才死心塌地持名。"};
 const OYLN={"1": "0365b25", "2": "0366c12", "3": "0367b15", "4": "0367c25", "5": "0368a22", "6": "0368b23", "7": "0369c16", "8": "0370c03", "9": "0371a16", "10": "0371a16", "11": "0372b25", "12": "0373b19", "13": "0373c22", "14": "0374a12", "15": "0374b15"};
 const DEEPSY={"1": ["「如是我聞」是阿難在結集時說的：這是我親耳聽佛說的。「一時」指的不是某年某月，而是不分地區的共同時間。祇樹給孤獨園，是須達長者以金鋪地買下、祇陀王子再供樹木，所以兩人名字並列。聽眾分三類：大比丘（千二百五十人是代表，十六位是最早證阿羅漢的大弟子）、菩薩（文殊代表智慧，彌勒代表成佛大願，乾陀訶提與常精進代表不休息、常精進）、天人。觀音、勢至沒有出現，因為這部經是釋迦佛在介紹，不是阿彌陀佛自己在介紹極樂世界。", "336–350"], "2": ["別序點出主題：從娑婆往西、過十萬億佛土，有世界名極樂，佛號阿彌陀，現在正說法。佛特別對智慧第一的舍利弗說，顯示這個法門深而難信，需要大智慧。講記提醒：釋迦佛的涅槃是化身；報身、法身不涅槃，彌陀則是無量壽。", "350–352"], "3": ["娑婆有生老病死等八苦，說是八苦，其實是無量苦；特別是心有煩惱時，常跟自己過不去，也跟他人過不去。極樂眾生「無有眾苦，但受諸樂」：那裡都是上善人，凡夫去了也沒有機會起煩惱；蓮花化生的身體不是肉身，所以沒有生老病死。蓮花是形容無漏業的清淨。", "353–354"], "4": ["七寶羅網、七重行樹、八功德水，講記說都是一種形容，意思是我們在那裡隨時都在修行（七寶、七重對三十七道品的七科，八功德水對八正道）。八功德：澄清、清涼、甘美、輕軟、潤澤、安和、除飢渴、長養諸根。人住自己的蓮花，彼此往來沒有妨礙，互相勉勵念佛、念法、念僧。", "354–357"], "5": ["天樂是清淨的音樂，曼陀羅花是天花。清晨各人以衣裓盛花供養十萬億佛，吃飯前就回來。講記說，這是借人間作息打的比方，實際是以禪悅、法食為食：聽法、修行、供養、經行，一個接著一個。", "357–358"], "6": ["白鶴、孔雀、鸚鵡等鳥，唱的是三十七道品，聽到的人自然念佛念法念僧。講記特別提醒：有人認為既然鳥都在說，人間就不必修；但正因如此，在人間就要先熟悉怎麼修，到了極樂世界才保證能上品上生。經說這些鳥不是罪報所生，是彌陀願力變化，連風吹寶樹寶網的聲音，也像百千種樂器同時演奏，聽了就想起三寶。", "358–369"], "7": ["阿彌陀的意思有無量光與無量壽。佛的光明是慈悲與智慧；簡單說，光就是「影響力」：存好心就是放光的人，用好心待人就能讓別人沾光。壽命無量指報身有始無終。極樂的人民也無量壽：蓮花化生的身體就是報身，已出離分段生死；那裡處處都在念佛，只會蓮品高升，不會向下沉淪。成佛十劫，在無量劫中算新的淨土。", "369–372"], "8": ["彌陀有無量無邊的聲聞弟子，都是阿羅漢，菩薩也一樣多；講記說這是指方便有餘土和實報莊嚴土。中品往生的人，在世修的是聲聞法，到了那裡成為聲聞，再證到阿羅漢（中品上生很快，中品中生、下生要較久）；也有迴小向大的人，雖發了菩提心仍示現聲聞相。「阿鞞跋致」是不退轉，分位不退、行不退、念不退。「諸上善人」是一生補處等菩薩，所以勸大家發願：能與這麼多善人同在一處。講記又說，在家也可以把家人看成上善人來相處。", "372–376"], "9": ["「不可以少善根福德因緣」。講記引兩種說法：蓮池大師說念佛念得少就是少善根福德；蕅益大師說善根是三十七道品，福德是布施、持戒、忍辱等助道，正助雙修才是淨土資糧。", "376–377"], "10": ["持名是最簡單的方法，但信、願、毅力要夠。一日到七日，與善根福德深淺有關。講記說：事一心不亂能決定往生（生凡聖同居土），理一心不亂更高；臨終要心不顛倒，也就是不被財物、親人、名利牽住。另有臨終十念等方便，講記也引《觀經》說十惡五逆者仍可稱名往生，並提醒：生前沒有布施、持戒、修功德的人，臨終往往不想念佛，因為捨不得放下。", "377–381"], "11": ["先說阿彌陀佛不可思議功德：橫超三界、橫具四土、持名簡易、七日可成、念一佛得十方諸佛護念（蕅益的說法）。再列東南西北下上六方諸佛，各出廣長舌相說誠實語。講記說名號只是代表，實際是恆河沙數，並說「廣長舌相」是形容說法普及三千大千世界。", "381–389"], "12": ["聽聞此經、受持（讀誦並實踐）、聽到諸佛名的人，都被十方諸佛護念。護是愛護，念是憶念，像母親心裡常記著不在身邊的孩子。講記說：沒有人關心你時，還有一切諸佛在護念。", "389–390"], "13": ["勸願：聽了之後要生信、發願，而且念念發願。已發願、正發願、將發願的人，都能不退轉。講記說三種不退是位不退、行不退、念不退，得了一種不退之後還要繼續發願，一直到念不退。《無量壽經》第十九願也呼應；但仍要在能念、能修的時候先做。", "391–394"], "14": ["釋迦佛在五濁惡世（劫濁、見濁、煩惱濁、眾生濁、命濁）說這個容易卻難信的法門，所以十方諸佛稱讚。講記說：淨土是先得解脫、再度眾生，並不違背因果；娑婆的「堪忍」是明明已經很苦，卻還是想要。老苦、病苦多在心不甘願，換個角度，苦就輕了。", "394–399"]};
-var APPV="V-3.503";
-var CHG=[{"v":"V-3.503","d":"2026-11-16","tm":"21:36","t":"深入頁資料核對：十三祖立祖沿革與連結、聖嚴卡片、小辭典更正"},{"v":"V-3.502","d":"2026-11-16","tm":"21:14","t":"修正：16 日下午一版因名詞解釋的連結寫法錯誤，整個工具打不開（只剩底圖），已修好"},{"v":"V-3.501","d":"2026-11-16","tm":"15:15","t":"名詞小辭典「阿鞞跋致／不退轉」對照釋厚觀《大智度論》講義補充說明，附講義連結"},{"v":"V-3.500","d":"2026-11-16","tm":"15:13","t":"深入頁新增：淨宗十三祖簡介（點名字展開，每位附資料連結）；每段可標記「看完了」並顯示已看完幾段；「兩家並排看」可把蓮池、蕅益、聖嚴任兩家同一段並排比較。"},{"v":"V-3.400","d":"2026-11-16","tm":"15:06","t":"首頁版次移到「累計念佛」下方，不會被按鈕蓋住；首頁四個方塊會顯示你進行到哪：讀到第幾段、背到第幾張小卡、深入看到第幾段（打開深入會接著上次那段）。"},{"v":"V-3.300","d":"2026-11-16","tm":"13:11","t":"新增更新提示：打開時若有新版本，會跳出提醒並列出改了什麼，按「更新」即可，進度會保留；沒網路時仍可離線開啟。"},{"v":"V-3.202","d":"2026-11-16","tm":"10:17","t":"首頁顯示目前版次與更新時間，點一下可看版本記錄。"},{"v":"V-3.201","d":"2026-11-16","tm":"10:08","t":"深入頁新增「先認識：淨土宗與幾位古德」。"},{"v":"V-3.200","d":"2026-11-16","tm":"08:43","t":"深入頁新增「蓮池大師怎麼看（《疏鈔》）」15 段，附 CBETA 原文連結。"},{"v":"V-3.100","d":"2026-11-16","tm":"08:02","t":"背誦小卡字數可自訂（30–300 字，每次增減 10 字），每種字數各自記錄進度；整部經典的經文改為靠左排列。"},{"v":"V-3.000","d":"2026-11-15","tm":"23:23","t":"念佛撥珠改得更沉穩；分段全工具一致；背誦單位改稱「小卡」（短／中／長）並標明出自第幾段；行距可選窄／寬；深入頁書目逐條附連結。"},{"v":"V-2.100","d":"2026-11-13","tm":"20:12","t":"誦經的分段（緊／標準／鬆）可用在背誦小卡與整部經典；整部經典開始念後，上方圖縮小成底圖；按「模糊／忘了」後，該段會再排入複習。"},{"v":"V-2.000","d":"2026-11-13","tm":"18:54","t":"新增「深入」頁（聖嚴法師開示、蕅益大師《要解》，附原文連結）；念佛可設定每串珠數、開始後進入獨立念佛畫面；讀經加入段落選單。"},{"v":"V-1.200","d":"2026-11-13","tm":"09:55","t":"念佛頁新增專注時段（番茄鐘式）；念佛之後才出現迴向；迴向偈改為淨土法會通用偈；佛珠按住會變大。"},{"v":"V-1.100","d":"2026-11-13","tm":"07:12","t":"誦經可選段落、段落可分緊／鬆；新增語音報讀；整個工具的字體大小可調；加入使用說明、工具聲明與 Logo。"},{"v":"V-1.000","d":"2026-11-13","tm":"05:46","t":"初版上線：首頁、讀經（15 段水彩繪本）、誦經（每天一張背誦小卡＋整部經典）、念佛（佛珠計數）、祝福卡。"}];
+var APPV="V-3.600";
+var CHG=[{"v":"V-3.600","d":"2026-11-17","tm":"07:14","t":"設定頁新增「帶走・接回進度」：可存成備份檔，或複製備份碼，換手機時一鍵接回（不需寄信）。深入頁新增「信願行小記錄」：每天自己點亮信、願、行，可寫一句話，不計分不比較。"},{"v":"V-3.503","d":"2026-11-16","tm":"21:36","t":"深入頁資料核對：十三祖立祖沿革與連結、聖嚴卡片、小辭典更正"},{"v":"V-3.502","d":"2026-11-16","tm":"21:14","t":"修正：16 日下午一版因名詞解釋的連結寫法錯誤，整個工具打不開（只剩底圖），已修好"},{"v":"V-3.501","d":"2026-11-16","tm":"15:15","t":"名詞小辭典「阿鞞跋致／不退轉」對照釋厚觀《大智度論》講義補充說明，附講義連結"},{"v":"V-3.500","d":"2026-11-16","tm":"15:13","t":"深入頁新增：淨宗十三祖簡介（點名字展開，每位附資料連結）；每段可標記「看完了」並顯示已看完幾段；「兩家並排看」可把蓮池、蕅益、聖嚴任兩家同一段並排比較。"},{"v":"V-3.400","d":"2026-11-16","tm":"15:06","t":"首頁版次移到「累計念佛」下方，不會被按鈕蓋住；首頁四個方塊會顯示你進行到哪：讀到第幾段、背到第幾張小卡、深入看到第幾段（打開深入會接著上次那段）。"},{"v":"V-3.300","d":"2026-11-16","tm":"13:11","t":"新增更新提示：打開時若有新版本，會跳出提醒並列出改了什麼，按「更新」即可，進度會保留；沒網路時仍可離線開啟。"},{"v":"V-3.202","d":"2026-11-16","tm":"10:17","t":"首頁顯示目前版次與更新時間，點一下可看版本記錄。"},{"v":"V-3.201","d":"2026-11-16","tm":"10:08","t":"深入頁新增「先認識：淨土宗與幾位古德」。"},{"v":"V-3.200","d":"2026-11-16","tm":"08:43","t":"深入頁新增「蓮池大師怎麼看（《疏鈔》）」15 段，附 CBETA 原文連結。"},{"v":"V-3.100","d":"2026-11-16","tm":"08:02","t":"背誦小卡字數可自訂（30–300 字，每次增減 10 字），每種字數各自記錄進度；整部經典的經文改為靠左排列。"},{"v":"V-3.000","d":"2026-11-15","tm":"23:23","t":"念佛撥珠改得更沉穩；分段全工具一致；背誦單位改稱「小卡」（短／中／長）並標明出自第幾段；行距可選窄／寬；深入頁書目逐條附連結。"},{"v":"V-2.100","d":"2026-11-13","tm":"20:12","t":"誦經的分段（緊／標準／鬆）可用在背誦小卡與整部經典；整部經典開始念後，上方圖縮小成底圖；按「模糊／忘了」後，該段會再排入複習。"},{"v":"V-2.000","d":"2026-11-13","tm":"18:54","t":"新增「深入」頁（聖嚴法師開示、蕅益大師《要解》，附原文連結）；念佛可設定每串珠數、開始後進入獨立念佛畫面；讀經加入段落選單。"},{"v":"V-1.200","d":"2026-11-13","tm":"09:55","t":"念佛頁新增專注時段（番茄鐘式）；念佛之後才出現迴向；迴向偈改為淨土法會通用偈；佛珠按住會變大。"},{"v":"V-1.100","d":"2026-11-13","tm":"07:12","t":"誦經可選段落、段落可分緊／鬆；新增語音報讀；整個工具的字體大小可調；加入使用說明、工具聲明與 Logo。"},{"v":"V-1.000","d":"2026-11-13","tm":"05:46","t":"初版上線：首頁、讀經（15 段水彩繪本）、誦經（每天一張背誦小卡＋整部經典）、念佛（佛珠計數）、祝福卡。"}];
 /* ===== 版次（首頁顯示，點開看版本記錄） ===== */
 (function(){const b=$('#hmVer');if(!b)return;const c=CHG[0];b.textContent=APPV+'　'+c.d+' '+c.tm;
 $('#vhNote').textContent='目前版本 '+APPV+'。例如 V-4.903：4 是大修（整體架構），9 是小修，03 是微調（文字等）。';
