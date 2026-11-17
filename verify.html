@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><pre id="o">running…</pre>
+<script>
+(async()=>{const o=document.getElementById('o');try{
+const h=await (await fetch('index.html')).text();
+const m=h.match(/const T367=(\[[\s\S]*?\]);\n/);const U=JSON.parse(m[1]);
+const j=await (await fetch('https://cbdata.dila.edu.tw/stable/juans?edition=CBETA&work=T0367&juan=1')).json();
+const d=new DOMParser().parseFromString(j.results[0],'text/html');
+d.querySelectorAll('.lb,.lineInfo,.facsimile,.noteAnchor').forEach(e=>e.remove());
+const body=d.getElementById('body');const src=body.textContent.replace(/\s+/g,'');
+const mine=U.map(u=>u.t).join('').replace(/\s+/g,'');
+const st=src.indexOf('如是我聞');const end=src.indexOf('信受奉行。')+5;
+const s=src.slice(st,end);
+let i=0;while(i<s.length&&i<mine.length&&s[i]===mine[i])i++;
+o.textContent='RESULT '+(s===mine?'IDENTICAL':'DIFF')+' srcLen='+s.length+' mineLen='+mine.length+' firstDiff='+i+'\nSRC:'+s.slice(Math.max(0,i-15),i+25)+'\nMINE:'+mine.slice(Math.max(0,i-15),i+25);
+}catch(e){o.textContent='ERROR '+e}})();
+</script>
