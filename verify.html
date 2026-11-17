@@ -2,8 +2,8 @@
 <script>
 (async()=>{const o=document.getElementById('o');try{
 const h=await (await fetch('index.html')).text();
-const U=JSON.parse(h.match(/const T367=(\[[\s\S]*?\]);\n/)[1]);
-const x=await (await fetch('https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T12/T12n0367.xml')).text();
+const U=JSON.parse(h.match(/const UNITS=(\[[\s\S]*?\]);\n/)[1]).map(u=>({t:u.sutra}));
+const x=await (await fetch('https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T12/T12n0366.xml')).text();
 let b=x.slice(x.indexOf('<body>'));
 b=b.replace(/<note[\s\S]*?<\/note>/g,'').replace(/<rdg[\s\S]*?<\/rdg>/g,'').replace(/<g [^>]*?ref="#(CB\d+)"[^>]*\/>/g,'{$1}').replace(/<[^>]+>/g,'');
 const H=s=>Array.from(s).filter(c=>/[㐀-鿿豈-﫿]|[\u{20000}-\u{3ffff}]|[{}A-Z0-9]/u.test(c)).join('');
