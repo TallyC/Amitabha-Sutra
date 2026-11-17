@@ -3,7 +3,7 @@
 (async()=>{const o=document.getElementById('o');try{
 const h=await (await fetch('index.html')).text();
 const m=h.match(/const T367=(\[[\s\S]*?\]);\n/);const U=JSON.parse(m[1]);
-const j=await (await fetch('https://cbdata.dila.edu.tw/stable/juans?edition=CBETA&work=T0367&juan=1')).json();
+let j;const urls=['https://cbdata.dila.edu.tw/stable/juans?edition=CBETA&work=T0367&juan=1','https://cbdata.dila.edu.tw/v1.2/juans?edition=CBETA&work=T0367&juan=1'];const errs=[];for(const u of urls){try{j=await (await fetch(u)).json();break}catch(e){errs.push(u+' '+e)}}if(!j){o.textContent='CORS/ERR index ok '+U.length+'\n'+errs.join('\n');return}
 const d=new DOMParser().parseFromString(j.results[0],'text/html');
 d.querySelectorAll('.lb,.lineInfo,.facsimile,.noteAnchor').forEach(e=>e.remove());
 const body=d.getElementById('body');const src=body.textContent.replace(/\s+/g,'');
