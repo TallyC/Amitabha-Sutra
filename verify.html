@@ -5,13 +5,13 @@ const h=await (await fetch('index.html')).text();
 const U=JSON.parse(h.match(/const UNITS=(\[[\s\S]*?\]);\n/)[1]).map(u=>({t:u.sutra}));
 const x=await (await fetch('https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T12/T12n0366.xml')).text();
 let b=x.slice(x.indexOf('<body>'));
-b=b.replace(/<note[\s\S]*?<\/note>/g,'').replace(/<rdg[\s\S]*?<\/rdg>/g,'').replace(/<g [^>]*?ref="#(CB\d+)"[^>]*\/>/g,'{$1}').replace(/<[^>]+>/g,'');
+b=b.replace(/<note[^>]*\/>/g,'').replace(/<rdg[^>]*\/>/g,'').replace(/<note[\s\S]*?<\/note>/g,'').replace(/<rdg[\s\S]*?<\/rdg>/g,'').replace(/<g [^>]*?ref="#(CB\d+)"[^>]*\/>/g,'{$1}').replace(/<[^>]+>/g,'');
 const H=s=>Array.from(s).filter(c=>/[㐀-鿿豈-﫿]|[\u{20000}-\u{3ffff}]|[{}A-Z0-9]/u.test(c)).join('');
 const src=H(b.replace(/\s+/g,''));
 const mine=H(U.map(u=>u.t).join(''));
 const st=src.indexOf('如是我聞'),en=src.lastIndexOf('信受奉行')+4;
 const s=src.slice(st,en);
 let i=0;while(i<s.length&&i<mine.length&&s[i]===mine[i])i++;
-o.textContent='RESULT '+(s===mine?'IDENTICAL':'DIFF')+' srcLen='+s.length+' mineLen='+mine.length+' firstDiff='+i+'\nSRC:'+s.slice(Math.max(0,i-15),i+30)+'\nMINE:'+mine.slice(Math.max(0,i-15),i+30);
+o.textContent='XMLLEN='+x.length+' st='+st+' head='+src.slice(0,40)+'\nRESULT '+(s===mine?'IDENTICAL':'DIFF')+' srcLen='+s.length+' mineLen='+mine.length+' firstDiff='+i+'\nSRC:'+s.slice(Math.max(0,i-15),i+30)+'\nMINE:'+mine.slice(Math.max(0,i-15),i+30);
 }catch(e){o.textContent='ERROR '+e}})();
 </script>
